@@ -6,6 +6,7 @@ from waitress import serve
 app = Flask(__name__)
 CORS(app)
 
+@app.route('/generate_report', methods=['POST'])
 def generate_report(dob,location,lat,lon,path,gender,name,timezone,input):
     babyReport(dob,location,lat,lon,path,gender,name,timezone,input)
     print("Report generated")

@@ -75,6 +75,7 @@ def get_planetary_positions(date_str, lat, lon, timezone):
     for planet, id in planets.items():
         result, _ = swe.calc_ut(jd, id, calc_flag)
         if result:
+            print(result)
             lon_now = result[0]
             positions[planet] = lon_now
 

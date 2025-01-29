@@ -489,35 +489,34 @@ class PDF(FPDF):
 def hex_to_rgb(hex_color):
     hex_color = hex_color.lstrip('#')
     return tuple(int(hex_color[i:i+2], 16) for i in range(0, 6, 2))
-        
-def generateBabyReport(formatted_date,formatted_time,location,lat,lon,planets,panchang,dasa,birthchart,gender,path,year,month,name = None):
-    pdf = PDF('P', 'mm', 'A4')
-    
-    pdf.set_auto_page_break(True)
-    
-    pdf.add_font('Karma-Heavy', '', f'{path}/fonts/Merienda-Bold.ttf')
-    pdf.add_font('Karma-Semi', '', f'{path}/fonts/Merienda-Regular.ttf') 
-    pdf.add_font('Karma-Regular', '', f'{path}/fonts/Linotte-Regular.otf')
-    
+
+def starterReport(pdf,path,planets,panchang,dasa,birthchart,formatted_date,formatted_time,location,year,month,name,DesignColors):
     pdf.add_page()
     pdf.set_font('Karma-Semi', '', 38)
     pdf.set_text_color(hex_to_rgb("#040606"))
-    pdf.image(f"{path}/babyImages/main.png", 0 , 0 , pdf.w , pdf.h)
+    pdf.image(f"{path}/babyImages/book-cover0.png", 0 , 0 , pdf.w , pdf.h)
+    pdf.AddPage(path)
     pdf.set_xy(30,40)
     pdf.multi_cell(pdf.w - 60, 18, f"{name.split()[0]}'s First Astrology Report", align='C')
+    pdf.set_font_size(22)
+    
+    pdf.image(f'{path}/babyImages/starting.png', pdf.w / 2 - 50, pdf.h / 2 - 50, 100, 100)
+    
+    pdf.set_xy(22.5, 220)
+    pdf.multi_cell(pdf.w - 45, 10, f"           The Precious Child Born on the auspicious day {formatted_date} at {formatted_time}. Place of birth is {location}")
     
     pdf.AddPage(path)
     pdf.set_y(30)
     pdf.cell(0,10,"Contents",align='C') 
     pdf.set_y(45)
-    for c in context:
+    for c in context[0]:
         if pdf.get_y() + (pdf.get_string_width(c) / (pdf.w - 30))  >= 260:
             pdf.AddPage(path)
             pdf.set_y(30)
             
         pdf.set_font('Karma-Semi', '', 16)
         pdf.set_xy(30,pdf.get_y() + 5)
-        pdf.multi_cell(pdf.w - 60,10,f"{context.index(c) + 1}. {c}",align='L') 
+        pdf.multi_cell(pdf.w - 60,10,f"{context[0].index(c) + 1}. {c}",align='L') 
     
     pdf.AddPage(path)
     pdf.set_xy(50,(pdf.h / 2) - 15)
@@ -1094,9 +1093,660 @@ def generateBabyReport(formatted_date,formatted_time,location,lat,lon,planets,pa
             pdf.multi_cell(pdf.w - 45,7,f"**Parenting Tips** : {tips['Tip']} {tips['Execution']}",align='L',markdown=True)
             pdf.set_y(pdf.get_y() + 10)
         else:
-            con = panchangPrompt(panchang,i,name,gender)
-            # con = panchangContent[i]
-            pdf.ContentDesign(random.choice(DesignColors),titles[i],con,path,name)   
+            # con = panchangPrompt(panchang,i,name,gender)
+            con = panchangContent[i]
+            pdf.ContentDesign(random.choice(DesignColors),titles[i],con,path,name)  
+            
+            
+    pdf.AddPage(path,"Famous Celebrity Comparisons")
+    content = nakshatraContent[moon['nakshatra']]
+    
+    x_start = 20
+    y_start = pdf.get_y() + 5
+    pdf.set_xy(x_start, y_start)
+    pdf.set_text_color(0,0,0)
+
+    table_data = [
+        (f"Name", f"Fields", "Characteristics"),
+    ]
+    
+    for con in content:
+        table_data.append((f"{con['name']}", f"{con['famous']}",f"{con['nakshatra']}"))
+        
+    width = (pdf.w - 40) / 3
+    
+    color = random.choice(DesignColors)
+    
+    for index,row in enumerate(table_data):
+        content = max(pdf.get_string_width(row[0]), pdf.get_string_width(row[1]), pdf.get_string_width(row[2]))
+            
+        if index == 0:
+            roundedBox(pdf, color, 20 , pdf.get_y(), pdf.w - 40, 20)
+        elif index != len(table_data) - 1:
+            roundedBox(pdf, color, 20 , pdf.get_y(), pdf.w - 40, (content / width) * 10 + 8, status=False)
+        else:
+            roundedBox(pdf, color, 20 , pdf.get_y(), pdf.w - 40, 5,status=False)
+            roundedBox(pdf, color, 20 , pdf.get_y(), pdf.w - 40, (content / width) * 10 + 5)
+            
+        pdf.set_font('Karma-Regular', '', 14)
+        pdf.multi_cell(width, 10, row[0], new_x=XPos.RIGHT, new_y=YPos.TOP,align='C')
+        pdf.set_font('Karma-Regular', '', 14)
+        pdf.multi_cell(width, 10, row[1], new_x=XPos.RIGHT, new_y=YPos.TOP,align='C')
+        pdf.set_font('Karma-Regular', '', 14)
+        pdf.multi_cell(width, 10, row[2],align='L')
+        y_start = pdf.get_y()
+        pdf.set_xy(x_start, y_start)    
+            
+def proReport(pdf,path,planets,panchang,dasa,birthchart,formatted_date,formatted_time,location,year,month,name,DesignColors):
+    pdf.add_page()
+    pdf.set_font('Karma-Semi', '', 38)
+    pdf.set_text_color(hex_to_rgb("#040606"))
+    pdf.image(f"{path}/babyImages/book-cover1.png", 0 , 0 , pdf.w , pdf.h)
+    pdf.AddPage(path)
+    pdf.set_xy(30,40)
+    pdf.multi_cell(pdf.w - 60, 18, f"{name.split()[0]}'s First Astrology Report", align='C')
+    pdf.set_font_size(22)
+    
+    pdf.image(f'{path}/babyImages/starting.png', pdf.w / 2 - 50, pdf.h / 2 - 50, 100, 100)
+    
+    pdf.set_xy(22.5, 220)
+    pdf.multi_cell(pdf.w - 45, 10, f"           The Precious Child Born on the auspicious day {formatted_date} at {formatted_time}. Place of birth is {location}")
+    
+    pdf.AddPage(path)
+    pdf.set_y(30)
+    pdf.cell(0,10,"Contents",align='C') 
+    pdf.set_y(45)
+    for c in context[1]:
+        if pdf.get_y() + (pdf.get_string_width(c) / (pdf.w - 30))  >= 260:
+            pdf.AddPage(path)
+            pdf.set_y(30)
+            
+        pdf.set_font('Karma-Semi', '', 16)
+        pdf.set_xy(30,pdf.get_y() + 5)
+        pdf.multi_cell(pdf.w - 60,10,f"{context[1].index(c) + 1}. {c}",align='L') 
+    
+    pdf.AddPage(path)
+    pdf.set_xy(50,(pdf.h / 2) - 15)
+    pdf.set_font('Karma-Heavy', '', 36) 
+    pdf.multi_cell(pdf.w - 100,15,f"{name}'s Astrology Details",align='C')
+    pdf.AddPage(path)
+    pdf.set_y(40)
+    pdf.set_font('Karma-Heavy', '', 42) 
+    pdf.set_text_color(hex_to_rgb("#E85D2B"))
+    pdf.cell(0,0,"Horoscope Details",align='C')
+    pdf.set_text_color(0,0,0)
+    
+    pdf.set_font('Karma-Regular', '', 22) 
+    
+    pdf.set_xy(20,60)
+    pdf.set_font_size(16)
+    asc = list(filter(lambda x: x['Name'] == 'Ascendant', planets))[0]
+    ninthHouseLord = zodiac_lord[((zodiac.index(asc['sign']) + 9) % 12) - 1]
+    signLord = list(filter(lambda x: x['Name'] == ninthHouseLord,planets))[0]
+
+    isthadevathaLord = list(filter(lambda x: x['Name'] == signLord['Name'],planets))[0]['nakshatra_lord']
+    
+    isthaDeva = ista_devatas[isthadevathaLord]
+    
+    atma = list(filter(lambda x: x['order'] == 1,planets))[0]
+    if atma['Name'] == "Ascendant":
+        atma = list(filter(lambda x: x['order'] == 2,planets))[0]
+        
+    moon = list(filter(lambda x : x['Name'] == "Moon",planets))[0]
+        
+    nakshatrasOrder = nakshatras[nakshatras.index(moon['nakshatra']):] + zodiac[:nakshatras.index(moon['nakshatra'])]
+    favourableNakshatra = ""
+    for index,nakshatra in enumerate(nakshatrasOrder):
+        if index % 9 == 1:
+            favourableNakshatra += f"{nakshatra}, "
+            
+    luckyNumber = nakshatraNumber[panchang['nakshatra']]
+    
+    fiveHouseLord = zodiac_lord[((zodiac.index(asc['sign']) + 5) % 12) - 1]
+    ninthHouseLord = zodiac_lord[((zodiac.index(asc['sign']) + 9) % 12) - 1]
+    
+    stones = [Planet_Gemstone_Desc[asc['zodiac_lord']],Planet_Gemstone_Desc[fiveHouseLord],Planet_Gemstone_Desc[ninthHouseLord]]
+
+    left_column_text = [
+        'Name :',
+        'Date Of Birth :',
+        'Time Of Birth :',
+        'Place Of Birth :',
+        'Birth Nakshatra, Lord :',
+        'Birth Rasi, Lord :',
+        'Birth Lagnam, Lord :',
+        'Tithi :',
+        'Nithya Yogam :',
+        'Karanam :',
+        'Birth Week Day :',
+        'Atma Karagam, Lord : ',
+        'Ishta Devata :',
+        'Benefic Stars :',
+        'Benefic Number :',
+        'Life Stone :',
+        'Benefictical Stone :',
+        'Lucky Stone :'
+    ]
+
+    right_column_text = [
+        f"{name}",
+        f"{formatted_date}",
+        f"{formatted_time}",
+        f"{location}",
+        f"{panchang['nakshatra']}, {planets[2]['nakshatra_lord']}",
+        f"{planets[2]['sign']}, {planets[2]['zodiac_lord']}",
+        f"{planets[0]['sign']}, {planets[0]['zodiac_lord']}",
+        f"{panchang['thithi']}",
+        f"{panchang['yoga']}",
+        f"{panchang['karanam']}",
+        f"{panchang['week_day']}",
+        f"{atma['Name']},{atma_names[atma['Name']]}",
+        f"{isthaDeva[0]}",
+        f"{favourableNakshatra}",
+        f"{luckyNumber[0]},{luckyNumber[1]}",
+        f"{stones[0]['Gemstone']}",
+        f"{stones[1]['Gemstone']}",
+        f"{stones[2]['Gemstone']}"
+    ]
+
+    x_start = 30
+    y_start = pdf.get_y() + 10
+    pdf.set_xy(x_start, y_start)
+
+    for index,row in enumerate(left_column_text):
+        pdf.set_font('Karma-Semi', '', 14)
+        pdf.cell(65, 10, row, new_x=XPos.RIGHT, new_y=YPos.TOP,align='R')
+        y_start = pdf.get_y()
+        pdf.set_font('Karma-Regular', '', 14)
+        pdf.multi_cell(100, 10, right_column_text[index],align='L')
+        y_start = pdf.get_y()
+        pdf.set_xy(x_start, y_start)
+    
+    name = name.split(" ")[0]
+    
+    pdf.AddPage(path)
+    pdf.set_font('Karma-Heavy', '', 26)  
+    pdf.set_y(30)
+    pdf.cell(0,0,'Birth Chart',align='C')
+    pdf.image(f"{path}/chart/{birthchart['birth_chart']}",(pdf.w / 2) - 45,pdf.get_y() + 10,90,90)
+    pdf.set_y(145)
+    pdf.cell(0,0,'Navamsa Chart',align='C')
+    pdf.image(f"{path}/chart/{birthchart['navamsa_chart']}",(pdf.w / 2) - 45,pdf.get_y() + 10,90,90)
+    pdf.set_y(pdf.get_y() + 110)
+
+    pdf.set_font('Karma-Regular', '', 18) 
+    for b in dasa[planets[1]['nakshatra_lord']]:
+        if (b['start_year'] <= year <= b['end_year']):
+            if not (year == b['end_year'] and b['end_month'] >= month):
+                pdf.cell(0,0,f"Dasa : {planets[2]['nakshatra_lord']} Bhukthi : {b['bhukthi']}",align='C')
+                break
+            
+    pdf.AddPage(path)
+    pdf.set_y(30)
+    pdf.set_font('Karma-Heavy', '', 32)  
+    pdf.cell(0,0,'Planetary Positions',align='C')
+    pdf.set_fill_color(200, 220, 255)  
+    pdf.set_font('Karma-Regular', '', 12)
+        
+    start_x = 5
+    start_y = 50
+    spacing_x = 80  
+    spacing_y = 80 
+    
+    colors = ["#FFFDAC","#EAECE8","#FFAF7B","#C6B9A9","#FFE8B2","#FDD29D","#C3B3AA","#A4EDFF","#C5FFB5","#FFF6F6"]
+    
+    for i, planet in enumerate(planets):
+        if i == 6:
+            pdf.AddPage(path)
+            x = start_x + 30
+            y = 30
+        elif i == 7:
+            x = start_x + spacing_x + 30
+            y = 30
+        elif i == 8:
+            x = start_x + 30
+            y = start_y + spacing_y - 20
+        elif i == 9:
+            x = start_x + spacing_x + 30
+            y = start_y + spacing_y - 20
+        else:
+            x = start_x + (i % 2) * spacing_x + 30  
+            y = start_y + (i // 2) * spacing_y 
+        
+        pdf.table(planet, x, y,path,colors[i])
+        
+    pdf.AddPage(path)
+    pdf.set_font('Karma-Heavy', '', 22)
+    pdf.set_y(20)
+    pdf.cell(0,0,f"{name}'s Favorable Times",align='C') 
+    
+    i = 0
+    
+    for d,b in dasa.items():
+        if i == 0:
+            x = 20
+            y = 20
+        if i == 1:
+            x = 80
+            y = 20
+        if i == 2:
+            x = 140
+            y = 20
+            
+        if i == 3:
+            x = 20
+            y = 145
+            
+        if i == 4:
+            x = 80
+            y = 145
+            
+        if i == 5:
+            x = 140
+            y = 145
+            
+        if i == 6:
+            pdf.AddPage(path)
+            x = 20
+            y = 15
+        
+        if i == 7:
+            x = 80
+            y = 15
+        
+        if i == 8:
+            x = 140
+            y = 15
+        
+        if i == 0:
+            start_age = 0
+            end_age =  int(b[-1]['end_year']) - year
+        else:
+            start_age =  int(b[0]['end_year']) - year
+            end_age =  int(b[-1]['end_year']) - year 
+        i = i + 1
+        pdf.setDasa(d,b,x,y,start_age,end_age,path)
+        
+    data = {
+        "Favourable": "#DAFFDC",
+        "Unfavourable": "#FFDADA",
+        "Moderate": "#DAE7FF"
+    }
+        
+    pdf.set_font('Karma-Heavy', '', 22)
+    pdf.set_xy(22.5,pdf.get_y() + 20)
+    pdf.cell(pdf.w - 45,0,f"Note:",align='L')
+    for i,(label,value) in enumerate(data.items()):
+        pdf.set_y(pdf.get_y() + 20)
+        pdf.set_fill_color(*hex_to_rgb(value))
+        pdf.rect(40,pdf.get_y() - 6,8,8,round_corners=True,corner_radius=5,style='F')
+        pdf.set_font('Karma-Semi', '', 16)
+        pdf.set_text_color(0,0,0)
+        pdf.text(55,pdf.get_y(),f'{label}')
+        
+    pdf.AddPage(path)
+    pdf.set_xy(20,20)
+    pdf.set_font('Karma-Heavy', '' , 26)
+    pdf.set_text_color(hex_to_rgb("#966A2F"))
+    pdf.multi_cell(pdf.w - 40 , 10, f"{name}'s Five Natural Elements", align='C')
+    elements = {
+        "Fire": 0,
+        "Earth": 0,
+        "Air": 0,
+        "Water" : 0 
+    }
+    
+    for pla in planets:
+        for d,k in elements.items():
+            if pla['Name'] == "Ascendant" or pla['Name'] == "Rahu" or pla['Name'] == "Ketu":
+                continue
+            if pla['sign'] in elements_data[d]:
+                elements[d] = elements[d] + 1 
+    for d,k in elements.items():
+        elements[d] = (elements[d] / 7) * 100
+                
+    max_key1 = max(elements, key=elements.get)
+    
+    max_value2 = 0
+    max_key2 = ""
+    
+    for k,v in elements.items():
+        if k == max_key1:
+            continue
+        
+        if v > max_value2:
+            max_value2 = v
+            max_key2 = k
+    
+    dominantElementData = elements_content[max_key1]
+    
+    pdf.set_text_color(hex_to_rgb("#04650D"))
+    pdf.set_fill_color(hex_to_rgb("#BAF596"))
+    pdf.set_draw_color(hex_to_rgb("#06FF4C"))
+    pdf.rect(22.5,pdf.get_y() + 5,pdf.w - 45,15,round_corners=True,corner_radius=5,style='DF')
+    pdf.set_y(pdf.get_y() + 5)
+    pdf.set_font_size(14)
+    pdf.cell(0,15,f"{name}'s Dominant Element are {max_key1} and {max_key2}",align='C') 
+    
+    pdf.set_font('Karma-Regular', '', 16) 
+    roundedBox(pdf,"#FFF2D7",20,pdf.get_y() + 20, pdf.w - 40,pdf.no_of_lines(dominantElementData[0],pdf.w - 45) * 8 + 5)
+    pdf.set_xy(23.5,pdf.get_y() + 22.5)
+    pdf.set_text_color(0,0,0)
+    pdf.multi_cell(pdf.w - 45,8,dominantElementData[0],align='L')
+        
+    colors = [
+        "#FF0000",
+        "#43A458",
+        "#B1DC36",
+        "#4399FF"
+    ]
+
+    x_start = 20
+    y_base = pdf.get_y() + 75
+    bar_width = 20
+    bar_spacing = 10
+    max_height = 50
+
+    pdf.draw_bar_chart(x_start, y_base, bar_width, bar_spacing, elements, colors, max_height, path)
+    
+    y = pdf.get_y() - 45
+    for i,(label,value) in enumerate(elements.items()):
+        pdf.set_font('Karma-Semi', '', 18)
+        pdf.set_text_color(*hex_to_rgb(colors[i]))
+        pdf.text(150,y,f'{label}: {value:.2f}%')
+        y += 15
+    
+    pdf.set_text_color(0,0,0)
+    pdf.set_y(pdf.get_y() + 15)
+    
+    pdf.cell(0,0,"Impacts on Personality",align='C')
+    pdf.set_font("Times", '', 14)
+    pdf.set_xy(22.5,pdf.get_y() + 5)
+    pdf.multi_cell(pdf.w - 45, 8, f"**Strength** : {dominantElementData[1][0]}, {dominantElementData[1][1]}, {dominantElementData[1][2]}, {dominantElementData[1][3]}",align='L',markdown=True)
+    pdf.set_xy(22.5,pdf.get_y())
+    pdf.set_font("Times", '', 14)
+    pdf.multi_cell(pdf.w - 45, 8, f"**Challenges** : {dominantElementData[2][0]}, {dominantElementData[2][1]}, {dominantElementData[2][2]}, {dominantElementData[2][3]}",align='L',markdown=True)
+    
+    pdf.set_y(pdf.get_y() + 10)
+    pdf.set_font('Karma-Semi', '', 16)
+    pdf.cell(0,0,f"Parenting Tips to Balance {max_key1} Element", align='C')	
+    pdf.set_xy(22.5,pdf.get_y() + 10)
+    pdf.set_font("Times", '', 14)
+    pdf.multi_cell(pdf.w - 45, 8, f"    **{dominantElementData[3]['title']}** : {dominantElementData[3]['desc']}",align='L',markdown=True)
+    
+    pdf.AddPage(path)
+    pdf.set_xy(20,20)
+    pdf.set_font('Karma-Heavy', '' , 26)
+    pdf.set_text_color(hex_to_rgb("#966A2F"))
+    pdf.multi_cell(pdf.w - 40 , 10, f"{name}'s  Ayurvedic Body Type", align='C')
+    pdf.set_text_color(hex_to_rgb("#04650D"))
+    pdf.set_fill_color(hex_to_rgb("#BAF596"))
+    pdf.set_draw_color(hex_to_rgb("#06FF4C"))
+    pdf.rect(22.5,pdf.get_y() + 5,pdf.w - 45,15,round_corners=True,corner_radius=5,style='DF')
+    pdf.set_y(pdf.get_y() + 5)
+    pdf.set_font_size(14)
+    lagna = list(filter(lambda x : x['Name'] == "Ascendant",planets))[0]
+    data = {
+        "Pitta": (int(constitutionRatio[moon['zodiac_lord']]['Pitta']) + int(constitutionRatio[lagna['zodiac_lord']]['Pitta'])) / 200 * 100,
+        "Kapha": (int(constitutionRatio[moon['zodiac_lord']]['Kapha']) + int(constitutionRatio[lagna['zodiac_lord']]['Kapha'])) / 200 * 100,
+        "Vadha": (int(constitutionRatio[moon['zodiac_lord']]['Vata']) + int(constitutionRatio[lagna['zodiac_lord']]['Vata'])) / 200 * 100,
+    }
+    
+    maxValue = max(data, key=data.get)
+    constitutionMax = Constitution[maxValue]
+    pdf.cell(0,15,f"{name}'s Body is Dominated by {maxValue} Nature",align='C') 
+    
+    
+    pdf.set_font('Karma-Regular', '', 14) 
+    roundedBox(pdf,"#D7ECFF",20,pdf.get_y() + 20,pdf.w - 40,pdf.no_of_lines(constitutionMax[0],pdf.w - 45) * 8 + 5)
+    pdf.set_xy(22.5,pdf.get_y() + 22.5)
+    pdf.set_text_color(0,0,0)
+    pdf.multi_cell(pdf.w - 45,8,f"{constitutionMax[0]}",align='L')
+    
+    colors = [
+        "#E34B4B",   
+        "#43C316",   
+        "#4BDAE3"    
+    ]
+
+    x_start = 30
+    y_base = pdf.get_y() + 60
+    bar_width = 20
+    bar_spacing = 20
+    max_height = 40
+
+    pdf.draw_bar_chart(x_start, y_base, bar_width, bar_spacing, data, colors, max_height,path)
+    pdf.set_y(pdf.get_y() - 35)
+    for i,(label,value) in enumerate(data.items()):
+        pdf.set_font('Karma-Semi', '', 18)
+        pdf.set_text_color(*hex_to_rgb(colors[i]))
+        pdf.text(150,pdf.get_y(),f'{label}: {value:.2f}%')
+        pdf.set_y(pdf.get_y() + 15)
+        
+    pdf.set_text_color(0,0,0)
+    pdf.set_y(pdf.get_y() + 10)
+    pdf.set_font('Karma-Semi', '', 16)
+    pdf.cell(0,0,"Impacts on Body Type, Emotions, and Health",align='C')
+    
+    pdf.set_font("Times", '', 14)
+    pdf.set_xy(22.5,pdf.get_y() + 5)
+    pdf.multi_cell(pdf.w - 45, 8, f"**Body Type** : {constitutionMax[1]}",align='L',markdown=True)
+    pdf.set_xy(22.5,pdf.get_y())
+    pdf.set_font("Times", '', 14)
+    pdf.multi_cell(pdf.w - 45, 8, f"**Emotions** : {constitutionMax[2]}",align='L',markdown=True)
+    pdf.set_xy(22.5,pdf.get_y())
+    pdf.set_font("Times", '', 14)
+    pdf.multi_cell(pdf.w - 45, 8, f"**Health** : {constitutionMax[3]}",align='L',markdown=True)
+    
+    pdf.set_y(pdf.get_y() + 10)
+    pdf.set_font('Karma-Semi', '', 16)
+    pdf.cell(0,0,f"Parenting Tips to Balance {max_key1} Dosha", align='C')	
+    pdf.set_xy(22.5,pdf.get_y() + 10)
+    pdf.set_font("Times", '', 14)
+    pdf.multi_cell(pdf.w - 45, 8, f"    **{constitutionMax[4]['title']}** : {constitutionMax[4]['desc']}",align='L',markdown=True)
+    
+    
+    DesignColors = ["#BDE0FE", "#FEFAE0", "#FFC8DD", "#CAF0F8", "#FBE0CE", "#C2BCFF", "#9DE3DB", "#EDBBA3", "#EDF2F4", "#FFD6A5" , "#CBF3DB", "#94D8FD", "#DEE2FF", "#FEEAFA", "#D7AEFF", "#EEE4E1"]
+    
+    chakrasOrder = ["Root Chakra","Sacral Chakra","Solar Plexus Chakra","Heart Chakra","Throat Chakra","Third Eye Chakra","Crown Chakra"]
+    
+    pdf.AddPage(path,f"{name}'s Chakras")
+    pdf.set_text_color(0,0,0)
+    pdf.set_font_size(18)
+    childChakras = chakras[planets[0]['sign']][0]
+    chakrasContent = chakra_desc[childChakras]
+    pdf.set_xy(20,pdf.get_y() + 10)
+    pdf.multi_cell(pdf.w - 40,8,f"{name}'s Dominant Chakra is {childChakras}",align='C')
+    pdf.set_font('Karma-Regular', '', 14)
+    pdf.set_xy(20,pdf.get_y() + 10)
+    pdf.multi_cell(pdf.w - 40,8,f"      {chakrasContent[0]}",align='L')
+    pdf.set_font("Karma-Heavy", '', 16)
+    pdf.set_xy(22.5, pdf.get_y() + 5)
+    pdf.multi_cell(pdf.w - 45,8, chakrasContent[1],align='C')
+    if chakrasOrder.index(childChakras) in [5,6]:
+        pdf.image(f"{path}/babyImages/chakra_{chakrasOrder.index(childChakras) + 1}.png",pdf.w / 2 - 20,pdf.get_y() + 5 ,40,0)
+    else:
+        pdf.image(f"{path}/babyImages/chakra_{chakrasOrder.index(childChakras) + 1}.png",pdf.w / 2 - 15,pdf.get_y() + 10 ,30,0)
+    pdf.set_y(pdf.get_y() + 55)
+    pdf.set_font('Karma-Heavy', '', 22)
+    pdf.cell(0,0,f"{childChakras}",align='C')
+    pdf.set_xy(22.5,pdf.get_y() + 10)   
+    pdf.set_font('Karma-Semi', '', 16)
+    pdf.multi_cell(pdf.w - 45,8,f"Parenting Tips to Increase {name}'s Aura and Energy Level",align='C')
+    pdf.set_xy(22.5, pdf.get_y() + 10)
+    pdf.set_font('Times', '' , 14)
+    pdf.multi_cell(pdf.w - 45,8,f"          **{chakrasContent[2]['title']}** : {chakrasContent[2]['desc']}",align='L',markdown=True)
+
+    pdf.AddPage(path,f"{name}'s True Self")
+    pdf.set_xy(20,pdf.get_y() + 10)
+    pdf.set_text_color(0,0,0)
+    pdf.set_font_size(18)
+    pdf.multi_cell(pdf.w - 40,8,f"Let's take a look at the three most influential and important sign for {name}!",align='C')
+    pdf.set_font('Karma-Semi', '', 18)
+    pdf.set_xy(30,pdf.get_y() + 10)
+    pdf.cell(0,0,f"As per {name}'s kundli,")
+    y = pdf.get_y() + 10
+    roundedBoxBorder(pdf,"#FFE769","#C5A200",20,y,planets[1]['Name'],planets[1]['sign'],path)
+    roundedBoxBorder(pdf,"#D1C4E9","#A394C6",80,y,planets[0]['Name'],planets[0]['sign'],path)
+    roundedBoxBorder(pdf,"#B3E5FC","#82B3C9",140,y,planets[2]['Name'],planets[2]['sign'],path)
+    pdf.set_y(pdf.get_y() + 10)
+    
+    content = {'child_personality': lagnaIdentity[planets[0]['sign']].replace("child",name).replace("Child",name), 'emotional_needs': moonIdentity[planets[2]['sign']].replace("child",name).replace("Child",name), 'core_identity': sunIdentity[planets[1]['sign']].replace("child",name).replace("Child",name)}
+    
+    trueTitle = {
+        "child_personality" : f"{name}'s Personality",
+        "emotional_needs" : f"{name}'s Emotions",
+        "core_identity" : f"{name}'s Core Identity"
+    }
+    
+    for index , (k, v) in enumerate(content.items()):
+        if pdf.get_y() + 30 >= 260:  
+            pdf.AddPage(path)
+            pdf.set_y(20)
+            
+        pdf.ContentDesign(random.choice(DesignColors),trueTitle[k],v,path,name)
+    
+        
+    pdf.AddPage(path,f"Panchangam: A Guide to {name}'s Flourishing Future")
+    pdf.set_font('Karma-Regular', '' , 14)
+    pdf.set_text_color(0,0,0)
+    pdf.set_xy(22.5,pdf.get_y() + 5)
+    pdf.multi_cell(pdf.w - 45, 8 , "Activating the Panchangam elements (Thithi, Vaaram, Nakshatra, Yogam, Karanam) can potentially bring balance to child's life, fostering positive energies and promoting growth.", align='L')
+    pdf.set_y(pdf.get_y() + 5)
+    pdf.lineBreak(f"{name} was born on {formatted_date}, {panchang['week_day']} (Vaaram), under {panchang['nakshatra']} Nakshatra, {panchang['paksha']} Paksha {panchang['thithi']} Thithi, {panchang['karanam']} Karanam, and {panchang['yoga']} Yogam",path, "#BAF596")
+    
+    colors = ["#E5FFB5","#94FFD2","#B2E4FF","#D6C8FF","#FFDECA"]    
+    titles = [f"Tithi Represents {name}'s Emotions, Mental Well-being",f"Vaaram Represents {name}'s Energy & Behaviour",f"Nakshatra Represents {name}'s Personality and Life Path",f"Yogam Represents {name}'s Prosperity and Life Transformation",f"Karanam Represents {name}'s Work and Actions"]
+    
+    titleImage = ['waningMoon.png' if panchang['thithi_number'] <= 15 else 'waxingMoon.png','week.png','nakshatra.png','yogam.png','karanam.png']
+    
+    panchangContent = [
+        "",
+        "",
+        "Magizh, born under the Bharani Nakshatra, possesses a dynamic and determined personality. He is known for his strong willpower, ambitious nature, and unwavering focus on achieving his goals. Magizh is often seen as a natural leader, with a charismatic presence that draws others towards him. His life path is marked by transformation and growth, as he navigates challenges with resilience and adaptability. Overall, Magizh's Bharani Nakshatra characteristics make him a force to be reckoned with, capable of achieving great success and making a lasting impact in the world.",
+        "Magizh, born under the Shiva Yogam, possesses a deep connection to spirituality and a strong sense of inner peace and tranquility. His goals revolve around achieving spiritual growth, enlightenment, and self-realization. With a profound understanding of the interconnectedness of all things, Magizh strives to spread positivity and uplift others around him, leaving a lasting impact of harmony and balance wherever he goes.",
+        ""
+    ]
+    
+    pdf.set_text_color(0,0,0)
+    pdf.set_y(pdf.get_y() + 5)
+    for i in range(0,5):
+        if pdf.get_y() + 50 >= 260:
+            pdf.AddPage(path)
+            pdf.set_y(30)
+        pdf.image(f"{path}/babyImages/{titleImage[i]}",pdf.w / 2 - 10,pdf.get_y() + 5,20,20) 
+        pdf.set_y(pdf.get_y() + 25)
+        
+        if i == 0:
+            positive = thithiContent[panchang['thithi']][0]
+            negative = thithiContent[panchang['thithi']][1]
+            tips = thithiContent[panchang['thithi']][2]
+            
+    
+            pdf.set_xy(22.5,pdf.get_y() + 5)
+            pdf.set_font('Karma-Semi', '', 18)
+            pdf.multi_cell(pdf.w - 45, 8,titles[i], align='C')
+            pdf.set_xy(22.5,pdf.get_y() + 5)
+            pdf.set_font('Karma-Regular', '', 14)
+            pdf.multi_cell(pdf.w - 45,7,f"{name} was born under {panchang['paksha']} {panchang['thithi']}, and the following are Thithi impacts on {name}'s Life ",align='C')
+            y = pdf.get_y() + 5
+            pdf.set_xy(20,y)
+            pdf.set_fill_color(hex_to_rgb("#DAFFDC"))
+            pdf.set_font('Karma-Semi', '', 16)
+            
+            pdf.checkNewPage(path)
+            data = [
+                (f"Strength",f"Challenges"),
+                (positive[0],negative[0]),
+                (positive[1],negative[1]),
+                (positive[2],negative[2])
+            ]
+            
+            pdf.panchangTable(data)
+                
+            if pdf.get_y() + 20 > 270:
+                pdf.AddPage(path)
+                pdf.set_y(20)
+            pdf.set_xy(30,pdf.get_y() + 10)
+            pdf.set_fill_color(hex_to_rgb(random.choice(DesignColors)))
+            pdf.set_font("Times", '', 14)
+            pdf.cell(pdf.w - 60,10,f"Thithi Lord: **{thithiLord[panchang['thithi']]}**",align='C',fill=True,new_y=YPos.NEXT,markdown=True)
+                
+            pdf.set_font("Times", '', 14)
+            pdf.set_xy(22.5,pdf.get_y() + 5)
+            pdf.multi_cell(pdf.w - 45,7,f"**Parenting Tips** : {tips['Name']} {tips['Description']} {tips['Execution']}",align='L',markdown=True)
+            pdf.set_y(pdf.get_y() + 10)
+            
+        elif i == 1:
+            positive = weekPlanetContent[panchang['week_day']][0]
+            negative = weekPlanetContent[panchang['week_day']][1]
+            tips = weekPlanetContent[panchang['week_day']][2]
+            pdf.checkNewPage(path)
+            
+            pdf.set_xy(22.5,pdf.get_y() + 5)
+            pdf.set_font('Karma-Semi', '', 18)
+            pdf.multi_cell(pdf.w - 45, 8,titles[i], align='C')
+            pdf.set_xy(22.5,pdf.get_y() + 5)
+            pdf.set_font('Karma-Regular', '', 14)
+            pdf.multi_cell(pdf.w - 45,7,f"{name} was born on {panchang['week_day']}, and the following are its impacts on {name}'s life:",align='C')
+            pdf.checkNewPage(path)
+            
+            pdf.checkNewPage(path)
+            data = [
+                (f"Strength",f"Challenges"),
+                (positive[0],negative[0]),
+                (positive[1],negative[1]),
+                (positive[2],negative[2])
+            ]
+            
+            pdf.panchangTable(data)         
+                
+            pdf.checkNewPage(path)
+            pdf.set_font("Times", '', 14)
+            roundedBox(pdf,random.choice(DesignColors),40,pdf.get_y() + 5,pdf.w - 80,10)
+            pdf.set_xy(30,pdf.get_y() + 5)
+            pdf.cell(pdf.w - 60,10,f"Rulling Planet: **{weekPlanet[panchang['week_day']]}**",align='C',new_y=YPos.NEXT,markdown=True)
+            
+            pdf.set_xy(22.5,pdf.get_y() + 5)
+            pdf.multi_cell(pdf.w - 45,7,f"**Parenting Tips** : {tips['Tip']} {tips['Execution']}",align='L',markdown=True)
+            pdf.set_y(pdf.get_y() + 10)
+            
+        elif i == 4:
+            positive = karanamContent[panchang['karanam']][0]
+            negative = karanamContent[panchang['karanam']][1]
+            tips = karanamContent[panchang['karanam']][2]
+            
+            pdf.checkNewPage(path)
+            
+            pdf.set_xy(22.5,pdf.get_y() + 5)
+            pdf.set_font('Karma-Semi', '', 18)
+            pdf.multi_cell(pdf.w - 45, 8,titles[i], align='C')
+            pdf.set_xy(22.5,pdf.get_y() + 5)
+            pdf.set_font('Karma-Regular', '', 14)
+            pdf.multi_cell(pdf.w - 45,7,f"{name} was born under {panchang['karanam']}, and the following are Karanm impacts on {name}'s life:",align='C')
+            pdf.checkNewPage(path)
+            
+            data = [
+                (f"Strength",f"Challenges"),
+                (positive[0],negative[0]),
+                (positive[1],negative[1]),
+                (positive[2],negative[2])
+            ]
+            
+            pdf.panchangTable(data)            
+            pdf.checkNewPage(path)
+            pdf.set_font("Times", '', 14)
+            pdf.set_xy(22.5,pdf.get_y() + 5)
+            pdf.multi_cell(pdf.w - 45,7,f"**Parenting Tips** : {tips['Tip']} {tips['Execution']}",align='L',markdown=True)
+            pdf.set_y(pdf.get_y() + 10)
+        else:
+            # con = panchangPrompt(panchang,i,name,gender)
+            con = panchangContent[i]
+            pdf.ContentDesign(random.choice(DesignColors),titles[i],con,path,name)
+            
+    asc = list(filter(lambda x: x['Name'] == 'Ascendant', planets))[0]
+    moon = list(filter(lambda x: x['Name'] == 'Moon', planets))[0]
+    
             
     sifted = zodiac[zodiac.index(asc['sign']):] + zodiac[:zodiac.index(asc['sign'])]
     pdf.AddPage(path,"Potential Health Challenges and Holistic Wellness Solutions")
@@ -1276,15 +1926,15 @@ def generateBabyReport(formatted_date,formatted_time,location,lat,lon,planets,pa
     pdf.multi_cell(pdf.w - 45, 8 , f"**Benefits:** {content[3]}",markdown=True)
 
                 
-    content2 = physical(planets,2,name,gender)
-    content3 = physical(planets,3,name,gender)
-    content4 = physical(planets,4,name,gender)
+    # content2 = physical(planets,2,name,gender)
+    # content3 = physical(planets,3,name,gender)
+    # content4 = physical(planets,4,name,gender)
 
-    # content2 = {'physical_attributes': 'Magizh has a balanced body built with a charming face type. His eyes are expressive and hold a sense of harmony. His physical appearance exudes grace and elegance, while his aura is charismatic and magnetic, drawing others towards him.', 'personality': ['Magizh possesses a charming and diplomatic personality, which helps him navigate social situations with ease.', 'He has a strong sense of justice and fairness, making him a reliable and trustworthy individual.', 'Magizh is creative and artistic, with an eye for beauty and design.'], 'character': ['Magizh is cooperative and seeks harmony in all his interactions, making him a peacemaker in his social circles.', 'He is sociable and enjoys connecting with others, forming meaningful relationships.', 'Magizh is adaptable and can easily adjust to new environments and circumstances.'], 'positive_behavior': ['Magizh exhibits a sense of balance and equilibrium in his actions, making thoughtful decisions.', 'He values relationships and shows empathy towards others, creating a supportive environment.', 'Magizh is diplomatic in his communication, resolving conflicts peacefully and effectively.'], 'negative_behavior': ['Magizh may struggle with indecisiveness, finding it challenging to make firm choices.', 'He might have a tendency to avoid confrontation and suppress his true emotions.', 'Magizh could be overly focused on maintaining external harmony, neglecting his own needs and desires.'], 'parenting_tips': 'To help Magizh overcome his negative behaviors and support his growth, encourage him to express his opinions and feelings openly. Teach him the importance of setting boundaries and asserting himself when necessary. Provide opportunities for Magizh to practice decision-making and assertiveness skills, guiding him to prioritize his own well-being while maintaining harmonious relationships with others. Foster a supportive and nurturing environment that values both his diplomatic nature and his individual needs. Encourage Magizh to seek counseling or therapy if needed to address any underlying issues causing his avoidance of conflict and emotional suppression. Remember to praise and reinforce his efforts towards personal growth and self-expression.'}
+    content2 = {'physical_attributes': 'Magizh has a balanced body built with a charming face type. His eyes are expressive and hold a sense of harmony. His physical appearance exudes grace and elegance, while his aura is charismatic and magnetic, drawing others towards him.', 'personality': ['Magizh possesses a charming and diplomatic personality, which helps him navigate social situations with ease.', 'He has a strong sense of justice and fairness, making him a reliable and trustworthy individual.', 'Magizh is creative and artistic, with an eye for beauty and design.'], 'character': ['Magizh is cooperative and seeks harmony in all his interactions, making him a peacemaker in his social circles.', 'He is sociable and enjoys connecting with others, forming meaningful relationships.', 'Magizh is adaptable and can easily adjust to new environments and circumstances.'], 'positive_behavior': ['Magizh exhibits a sense of balance and equilibrium in his actions, making thoughtful decisions.', 'He values relationships and shows empathy towards others, creating a supportive environment.', 'Magizh is diplomatic in his communication, resolving conflicts peacefully and effectively.'], 'negative_behavior': ['Magizh may struggle with indecisiveness, finding it challenging to make firm choices.', 'He might have a tendency to avoid confrontation and suppress his true emotions.', 'Magizh could be overly focused on maintaining external harmony, neglecting his own needs and desires.'], 'parenting_tips': 'To help Magizh overcome his negative behaviors and support his growth, encourage him to express his opinions and feelings openly. Teach him the importance of setting boundaries and asserting himself when necessary. Provide opportunities for Magizh to practice decision-making and assertiveness skills, guiding him to prioritize his own well-being while maintaining harmonious relationships with others. Foster a supportive and nurturing environment that values both his diplomatic nature and his individual needs. Encourage Magizh to seek counseling or therapy if needed to address any underlying issues causing his avoidance of conflict and emotional suppression. Remember to praise and reinforce his efforts towards personal growth and self-expression.'}
 
-    # content3 = {'emotional_state': 'Magizh, with the Moon positioned in the 7th house of Aries in Bharani nakshatra along with Planets Moon and Jupiter, tends to have a strong sense of independence and a need for personal space. Magizh believes in taking action and being assertive in order to achieve their goals. Emotionally, Magizh is passionate, determined, and sometimes impatient.', 'emotions': ['Passionate and enthusiastic in pursuing their desires', "Can become easily frustrated when things don't go as planned", 'Has a fiery and competitive spirit when faced with challenges'], 'feelings': ['Feels a strong sense of individuality and self-reliance', 'Experiences a drive to constantly seek new experiences and adventures', 'May feel restless or impulsive when restricted or confined'], 'reactions': ['Responds quickly to situations with courage and boldness', 'May become defensive when their independence is questioned', 'Takes the lead and initiates action in group settings'], 'negative_imbalance': ['Tendency towards impulsiveness leading to rash decision-making', "Difficulty in compromising and considering others' perspectives", 'Struggles with anger issues and maintaining harmony in relationships'], 'parenting_tips': "To support Magizh in managing their negative emotional imbalances and foster growth, it is important to encourage self-reflection and mindfulness. Parents can help Magizh by teaching them the importance of taking a pause before reacting impulsively. Encourage open communication and active listening to understand others' viewpoints. Provide outlets for physical activities to channel the excess energy positively. Set boundaries and teach conflict resolution skills to promote healthy relationships. Practice gratitude and positivity to cultivate emotional balance."}
+    content3 = {'emotional_state': 'Magizh, with the Moon positioned in the 7th house of Aries in Bharani nakshatra along with Planets Moon and Jupiter, tends to have a strong sense of independence and a need for personal space. Magizh believes in taking action and being assertive in order to achieve their goals. Emotionally, Magizh is passionate, determined, and sometimes impatient.', 'emotions': ['Passionate and enthusiastic in pursuing their desires', "Can become easily frustrated when things don't go as planned", 'Has a fiery and competitive spirit when faced with challenges'], 'feelings': ['Feels a strong sense of individuality and self-reliance', 'Experiences a drive to constantly seek new experiences and adventures', 'May feel restless or impulsive when restricted or confined'], 'reactions': ['Responds quickly to situations with courage and boldness', 'May become defensive when their independence is questioned', 'Takes the lead and initiates action in group settings'], 'negative_imbalance': ['Tendency towards impulsiveness leading to rash decision-making', "Difficulty in compromising and considering others' perspectives", 'Struggles with anger issues and maintaining harmony in relationships'], 'parenting_tips': "To support Magizh in managing their negative emotional imbalances and foster growth, it is important to encourage self-reflection and mindfulness. Parents can help Magizh by teaching them the importance of taking a pause before reacting impulsively. Encourage open communication and active listening to understand others' viewpoints. Provide outlets for physical activities to channel the excess energy positively. Set boundaries and teach conflict resolution skills to promote healthy relationships. Practice gratitude and positivity to cultivate emotional balance."}
 
-    # content4 = {'core_insights': "Magizh, with the Sun positioned in the 3rd house of Sagittarius in Mula nakshatra, is driven by a deep desire for knowledge and intellectual pursuits. His core identity is centered around exploration, seeking truth and meaning, and expressing his beliefs with conviction. His inner strength lies in his optimism, curiosity, and adaptability, which enable him to navigate various challenges with a sense of adventure and purpose. However, Magizh's ego can sometimes be overly proud and self-righteous, leading to conflicts in relationships and a tendency to impose his views on others.", 'recognitions': ['Magizh seeks recognition for his intellectual achievements and philosophical insights.', 'He also craves acknowledgment for his ability to communicate persuasively and inspire others.', 'Magizh desires recognition for his adventurous spirit and willingness to explore new ideas and cultures.'], 'core_identity': ["Magizh's core identity is shaped by his quest for truth and wisdom.", 'His belief in the power of knowledge and education drives his actions and interactions with others.', "Magizh's identity is rooted in his philosophical nature, love for learning, and his ability to inspire those around him."], 'parenting_tips': 'Encourage Magizh to practice humility and empathy in his interactions with others. Teach him to listen actively, consider different perspectives, and appreciate the diversity of opinions and experiences. Guide Magizh to engage in meaningful conversations that foster understanding and mutual respect. By nurturing these qualities, Magizh can develop a more balanced sense of self and build stronger connections with those around him.'}
+    content4 = {'core_insights': "Magizh, with the Sun positioned in the 3rd house of Sagittarius in Mula nakshatra, is driven by a deep desire for knowledge and intellectual pursuits. His core identity is centered around exploration, seeking truth and meaning, and expressing his beliefs with conviction. His inner strength lies in his optimism, curiosity, and adaptability, which enable him to navigate various challenges with a sense of adventure and purpose. However, Magizh's ego can sometimes be overly proud and self-righteous, leading to conflicts in relationships and a tendency to impose his views on others.", 'recognitions': ['Magizh seeks recognition for his intellectual achievements and philosophical insights.', 'He also craves acknowledgment for his ability to communicate persuasively and inspire others.', 'Magizh desires recognition for his adventurous spirit and willingness to explore new ideas and cultures.'], 'core_identity': ["Magizh's core identity is shaped by his quest for truth and wisdom.", 'His belief in the power of knowledge and education drives his actions and interactions with others.', "Magizh's identity is rooted in his philosophical nature, love for learning, and his ability to inspire those around him."], 'parenting_tips': 'Encourage Magizh to practice humility and empathy in his interactions with others. Teach him to listen actively, consider different perspectives, and appreciate the diversity of opinions and experiences. Guide Magizh to engage in meaningful conversations that foster understanding and mutual respect. By nurturing these qualities, Magizh can develop a more balanced sense of self and build stronger connections with those around him.'}
     
     content = [content2,content3,content4]
     titles = [{
@@ -1378,10 +2028,1053 @@ def generateBabyReport(formatted_date,formatted_time,location,lat,lon,planets,pa
                 pdf.set_y(30)
             
         pdf.ContentDesign(random.choice(DesignColors),educationTitle[k],v,path,name)
+        
+    planetMain = {
+        "Sun" : "Soul, Vitality, & Leadership Qualities",
+        "Moon" : "Emotions, Intuition, Nurturing  Mind.",
+        "Mars" : "Energy, Courage, Passion, and Assertiveness.",
+        "Mercury" : "Communications, Intelligence, Adaptability.",
+        "Jupiter" : "Wisdom, Expansion, Knowledge, Spirituality.",
+        "Venus" :  "Love, Relationships, Beauty, Art, Comforts.",
+        "Saturn" : "Discipline, Responsibility, Challenges.",
+        "Rahu" :  "Desires, Ambitions, Worldly Attachment." ,
+        "Ketu" : "Spirituality, Detachment, Past Life Influence." 
+    }
+    
+    
+    for index,planet in enumerate(planets):
+        if planet['Name'] == "Ascendant":
+            continue
+        planets_table = table[planet['Name']]
+        
+        if planet['zodiac_lord'] in planets_table[0]:
+            planet['status'] = "Favorable"
+        elif planet['zodiac_lord'] in planets_table[1]:
+            planet['status'] = "Unfavorable"
+        else:
+            planet['status'] = "Neutral"
             
+        pdf.AddPage(path)
+            
+        pdf.set_text_color(hex_to_rgb("#966A2F"))
+        pdf.set_font('Karma-Heavy', '', 20)
+        pdf.set_xy(20,pdf.get_y() + 5)
+        pdf.multi_cell(pdf.w - 40,10,f"{planet['Name']} - {planetMain[planet['Name']]}",align='C')
+        pdf.image(f"{path}/babyImages/{planet['Name']}.png",40,pdf.get_y() + 10,30,30)
+        y = pdf.get_y() + 10
+        pdf.set_font('Karma-Regular', '', 12) 
+        pdf.set_text_color(0,0,0)
+        content = planetDesc[planet['Name']]
+        if planet['Name'] == "Rahu" or planet['Name'] == "Ketu":
+            roundedBox(pdf,random.choice(DesignColors),85,pdf.get_y() + 5,110, pdf.no_of_lines(content[0],105) * 8 + 5)
+            pdf.set_xy(90,pdf.get_y() + 7.5)
+            pdf.multi_cell(105,8,content[0],align='L')
+        else:
+            roundedBox(pdf,random.choice(DesignColors),85,pdf.get_y() + 10,110, pdf.no_of_lines(content[0],105) * 8 + 5)
+            pdf.set_xy(90,pdf.get_y() + 12.5)
+            pdf.multi_cell(105,8,content[0],align='L')
+        
+        if planet['Name'] == "Ketu":
+            y = y + 10
+        
+        pdf.set_y(y + 40)
+        if planet['Name'] == "Ketu":
+            pdf.set_y(pdf.get_y() - 7.5)
+        color = random.choice(DesignColors)
+        roundedBox(pdf, color ,20,pdf.get_y(),pdf.w-40, 40)
+        pdf.set_y(pdf.get_y() + 7.5)
+        pdf.set_font('Karma-Semi', '' , 16) 
+        pdf.cell(0,0,f"Teach Discipline : {content[1][0]}",align='C')
+        pdf.set_xy(22.5,pdf.get_y() + 5)
+        pdf.set_font('Karma-Regular', '', 14)
+        
+        smallTitle = {
+            1 : f"{planet['Name']} Guide to {name}: ",
+            2 : "",
+            3 : f"Say to {name}: "
+        }
+        
+        for i in range(1,len(content[1])):
+            content[2][i] = content[2][i].replace("child",name).replace("Child",name)
+            if i != len(content[1]) - 1:
+                roundedBox(pdf, color ,20,pdf.get_y(),pdf.w-40, pdf.no_of_lines(f"{smallTitle[i]}{content[1][i]}",pdf.w - 45) * 7 + 7,status=False)
+            else:
+                roundedBox(pdf, color ,20,pdf.get_y(),pdf.w-40 , pdf.no_of_lines(f"{smallTitle[i]}{content[1][i]}",pdf.w - 45) * 7 + 7)
+                roundedBox(pdf, color ,20,pdf.get_y(),pdf.w-40 , 5,status=False)
+            content[1][i] = content[1][i].replace("child",name).replace("Child",name)
+            pdf.multi_cell(pdf.w - 45,7,f"{smallTitle[i]}{content[1][i]}",align='L',new_y=YPos.NEXT, new_x=XPos.LEFT)
+        pdf.set_y(pdf.get_y() + 15)
+        if planet['Name'] == "Ketu":
+            pdf.set_y(pdf.get_y() - 5)
+        color = random.choice(DesignColors)
+        roundedBox(pdf, color ,20,pdf.get_y(),pdf.w-40, 40)
+        pdf.set_font('Karma-Semi', '' , 16) 
+        pdf.set_y(pdf.get_y() + 7.5)
+        pdf.cell(0,0,f"Teach Life Lesson : {content[2][0]}",align='C')
+        pdf.set_xy(22.5,pdf.get_y() + 5)
+        pdf.set_font('Karma-Regular', '', 14)
+        
+        for i in range(1,len(content[2])):
+            content[2][i] = content[2][i].replace("child",name).replace("Child",name)
+            if i != len(content[1]) - 1:
+                roundedBox(pdf, color ,20,pdf.get_y(),pdf.w-40, pdf.no_of_lines(f"{smallTitle[i]}{content[2][i]}",pdf.w - 45) * 7 + 7,status=False)
+            else:
+                roundedBox(pdf,color ,20,pdf.get_y(),pdf.w-40 , pdf.no_of_lines(f"{smallTitle[i]}{content[2][i]}",pdf.w - 45) * 7 + 7)
+                roundedBox(pdf, color ,20,pdf.get_y(),pdf.w-40 , 5,status=False)
+            pdf.multi_cell(pdf.w - 45,7,f"{smallTitle[i]}{content[2][i]}",align='L',new_y=YPos.NEXT, new_x=XPos.LEFT)
+        pdf.set_y(pdf.get_y() + 15)
+        if planet['Name'] == "Ketu":
+            pdf.set_y(pdf.get_y() - 5)
+        color = random.choice(DesignColors)
+        roundedBox(pdf, color ,20,pdf.get_y(),pdf.w-40, 40)
+        pdf.set_font('Karma-Semi', '' , 16) 
+        pdf.set_y(pdf.get_y() + 7.5)
+        pdf.cell(0,0,f"Teach Food & Diet : {content[4][0]}",align='C')
+        pdf.set_xy(22.5,pdf.get_y() + 5)
+        pdf.set_font('Karma-Regular', '', 14)
+        for i in range(1,len(content[4])):
+            content[2][i] = content[2][i].replace("child",name).replace("Child",name)
+            if i != len(content[1]) - 1:
+                roundedBox(pdf, color ,20,pdf.get_y(),pdf.w-40, pdf.no_of_lines(f"{smallTitle[i]}{content[4][i]}",pdf.w - 45) * 7 + 7,status=False)
+            else:
+                roundedBox(pdf, color ,20,pdf.get_y(),pdf.w-40 , pdf.no_of_lines(f"{smallTitle[i]}{content[4][i]}",pdf.w - 45) * 7 + 7)
+                roundedBox(pdf, color ,20,pdf.get_y(),pdf.w-40 , 5,status=False)
+            pdf.multi_cell(pdf.w - 45,7,f"{smallTitle[i]}{content[4][i]}",align='L',new_y=YPos.NEXT, new_x=XPos.LEFT)
+            
+    pdf.AddPage(path,"Famous Celebrity Comparisons")
+    content = nakshatraContent[moon['nakshatra']]
+    
+    x_start = 20
+    y_start = pdf.get_y() + 5
+    pdf.set_xy(x_start, y_start)
+    pdf.set_text_color(0,0,0)
+
+    table_data = [
+        (f"Name", f"Fields", "Characteristics"),
+    ]
+    
+    for con in content:
+        table_data.append((f"{con['name']}", f"{con['famous']}",f"{con['nakshatra']}"))
+        
+    width = (pdf.w - 40) / 3
+    
+    color = random.choice(DesignColors)
+    
+    for index,row in enumerate(table_data):
+        content = max(pdf.get_string_width(row[0]), pdf.get_string_width(row[1]), pdf.get_string_width(row[2]))
+            
+        if index == 0:
+            roundedBox(pdf, color, 20 , pdf.get_y(), pdf.w - 40, 20)
+        elif index != len(table_data) - 1:
+            roundedBox(pdf, color, 20 , pdf.get_y(), pdf.w - 40, (content / width) * 10 + 8, status=False)
+        else:
+            roundedBox(pdf, color, 20 , pdf.get_y(), pdf.w - 40, 5,status=False)
+            roundedBox(pdf, color, 20 , pdf.get_y(), pdf.w - 40, (content / width) * 10 + 5)
+            
+        pdf.set_font('Karma-Regular', '', 14)
+        pdf.multi_cell(width, 10, row[0], new_x=XPos.RIGHT, new_y=YPos.TOP,align='C')
+        pdf.set_font('Karma-Regular', '', 14)
+        pdf.multi_cell(width, 10, row[1], new_x=XPos.RIGHT, new_y=YPos.TOP,align='C')
+        pdf.set_font('Karma-Regular', '', 14)
+        pdf.multi_cell(width, 10, row[2],align='L')
+        y_start = pdf.get_y()
+        pdf.set_xy(x_start, y_start) 
+        
+def ultimateReport(pdf,path,planets,panchang,dasa,birthchart,formatted_date,formatted_time,location,year,month,name,DesignColors):
+    pdf.add_page()
+    pdf.set_font('Karma-Semi', '', 38)
+    pdf.set_text_color(hex_to_rgb("#040606"))
+    pdf.image(f"{path}/babyImages/book-cover2.png", 0 , 0 , pdf.w , pdf.h)
+    pdf.AddPage(path)
+    pdf.set_xy(30,40)
+    pdf.multi_cell(pdf.w - 60, 18, f"{name.split()[0]}'s First Astrology Report", align='C')
+    pdf.set_font_size(22)
+    
+    pdf.image(f'{path}/babyImages/starting.png', pdf.w / 2 - 50, pdf.h / 2 - 50, 100, 100)
+    
+    pdf.set_xy(22.5, 220)
+    pdf.multi_cell(pdf.w - 45, 10, f"           The Precious Child Born on the auspicious day {formatted_date} at {formatted_time}. Place of birth is {location}")
+    
+    pdf.AddPage(path)
+    pdf.set_y(30)
+    pdf.cell(0,10,"Contents",align='C') 
+    pdf.set_y(45)
+    for c in context[2]:
+        if pdf.get_y() + (pdf.get_string_width(c) / (pdf.w - 30))  >= 260:
+            pdf.AddPage(path)
+            pdf.set_y(30)
+            
+        pdf.set_font('Karma-Semi', '', 16)
+        pdf.set_xy(30,pdf.get_y() + 5)
+        pdf.multi_cell(pdf.w - 60,10,f"{context[2].index(c) + 1}. {c}",align='L') 
+    
+    pdf.AddPage(path)
+    pdf.set_xy(50,(pdf.h / 2) - 15)
+    pdf.set_font('Karma-Heavy', '', 36) 
+    pdf.multi_cell(pdf.w - 100,15,f"{name}'s Astrology Details",align='C')
+    pdf.AddPage(path)
+    pdf.set_y(40)
+    pdf.set_font('Karma-Heavy', '', 42) 
+    pdf.set_text_color(hex_to_rgb("#E85D2B"))
+    pdf.cell(0,0,"Horoscope Details",align='C')
+    pdf.set_text_color(0,0,0)
+    
+    pdf.set_font('Karma-Regular', '', 22) 
+    
+    pdf.set_xy(20,60)
+    pdf.set_font_size(16)
+    asc = list(filter(lambda x: x['Name'] == 'Ascendant', planets))[0]
+    ninthHouseLord = zodiac_lord[((zodiac.index(asc['sign']) + 9) % 12) - 1]
+    signLord = list(filter(lambda x: x['Name'] == ninthHouseLord,planets))[0]
+
+    isthadevathaLord = list(filter(lambda x: x['Name'] == signLord['Name'],planets))[0]['nakshatra_lord']
+    
+    isthaDeva = ista_devatas[isthadevathaLord]
+    
+    atma = list(filter(lambda x: x['order'] == 1,planets))[0]
+    if atma['Name'] == "Ascendant":
+        atma = list(filter(lambda x: x['order'] == 2,planets))[0]
+        
+    moon = list(filter(lambda x : x['Name'] == "Moon",planets))[0]
+        
+    nakshatrasOrder = nakshatras[nakshatras.index(moon['nakshatra']):] + zodiac[:nakshatras.index(moon['nakshatra'])]
+    favourableNakshatra = ""
+    for index,nakshatra in enumerate(nakshatrasOrder):
+        if index % 9 == 1:
+            favourableNakshatra += f"{nakshatra}, "
+            
+    luckyNumber = nakshatraNumber[panchang['nakshatra']]
+    
+    fiveHouseLord = zodiac_lord[((zodiac.index(asc['sign']) + 5) % 12) - 1]
+    ninthHouseLord = zodiac_lord[((zodiac.index(asc['sign']) + 9) % 12) - 1]
+    
+    stones = [Planet_Gemstone_Desc[asc['zodiac_lord']],Planet_Gemstone_Desc[fiveHouseLord],Planet_Gemstone_Desc[ninthHouseLord]]
+
+    left_column_text = [
+        'Name :',
+        'Date Of Birth :',
+        'Time Of Birth :',
+        'Place Of Birth :',
+        'Birth Nakshatra, Lord :',
+        'Birth Rasi, Lord :',
+        'Birth Lagnam, Lord :',
+        'Tithi :',
+        'Nithya Yogam :',
+        'Karanam :',
+        'Birth Week Day :',
+        'Atma Karagam, Lord : ',
+        'Ishta Devata :',
+        'Benefic Stars :',
+        'Benefic Number :',
+        'Life Stone :',
+        'Benefictical Stone :',
+        'Lucky Stone :'
+    ]
+
+    right_column_text = [
+        f"{name}",
+        f"{formatted_date}",
+        f"{formatted_time}",
+        f"{location}",
+        f"{panchang['nakshatra']}, {planets[2]['nakshatra_lord']}",
+        f"{planets[2]['sign']}, {planets[2]['zodiac_lord']}",
+        f"{planets[0]['sign']}, {planets[0]['zodiac_lord']}",
+        f"{panchang['thithi']}",
+        f"{panchang['yoga']}",
+        f"{panchang['karanam']}",
+        f"{panchang['week_day']}",
+        f"{atma['Name']},{atma_names[atma['Name']]}",
+        f"{isthaDeva[0]}",
+        f"{favourableNakshatra}",
+        f"{luckyNumber[0]},{luckyNumber[1]}",
+        f"{stones[0]['Gemstone']}",
+        f"{stones[1]['Gemstone']}",
+        f"{stones[2]['Gemstone']}"
+    ]
+
+    x_start = 30
+    y_start = pdf.get_y() + 10
+    pdf.set_xy(x_start, y_start)
+
+    for index,row in enumerate(left_column_text):
+        pdf.set_font('Karma-Semi', '', 14)
+        pdf.cell(65, 10, row, new_x=XPos.RIGHT, new_y=YPos.TOP,align='R')
+        y_start = pdf.get_y()
+        pdf.set_font('Karma-Regular', '', 14)
+        pdf.multi_cell(100, 10, right_column_text[index],align='L')
+        y_start = pdf.get_y()
+        pdf.set_xy(x_start, y_start)
+    
+    name = name.split(" ")[0]
+    
+    pdf.AddPage(path)
+    pdf.set_font('Karma-Heavy', '', 26)  
+    pdf.set_y(30)
+    pdf.cell(0,0,'Birth Chart',align='C')
+    pdf.image(f"{path}/chart/{birthchart['birth_chart']}",(pdf.w / 2) - 45,pdf.get_y() + 10,90,90)
+    pdf.set_y(145)
+    pdf.cell(0,0,'Navamsa Chart',align='C')
+    pdf.image(f"{path}/chart/{birthchart['navamsa_chart']}",(pdf.w / 2) - 45,pdf.get_y() + 10,90,90)
+    pdf.set_y(pdf.get_y() + 110)
+
+    pdf.set_font('Karma-Regular', '', 18) 
+    for b in dasa[planets[1]['nakshatra_lord']]:
+        if (b['start_year'] <= year <= b['end_year']):
+            if not (year == b['end_year'] and b['end_month'] >= month):
+                pdf.cell(0,0,f"Dasa : {planets[2]['nakshatra_lord']} Bhukthi : {b['bhukthi']}",align='C')
+                break
+            
+    pdf.AddPage(path)
+    pdf.set_y(30)
+    pdf.set_font('Karma-Heavy', '', 32)  
+    pdf.cell(0,0,'Planetary Positions',align='C')
+    pdf.set_fill_color(200, 220, 255)  
+    pdf.set_font('Karma-Regular', '', 12)
+        
+    start_x = 5
+    start_y = 50
+    spacing_x = 80  
+    spacing_y = 80 
+    
+    colors = ["#FFFDAC","#EAECE8","#FFAF7B","#C6B9A9","#FFE8B2","#FDD29D","#C3B3AA","#A4EDFF","#C5FFB5","#FFF6F6"]
+    
+    for i, planet in enumerate(planets):
+        if i == 6:
+            pdf.AddPage(path)
+            x = start_x + 30
+            y = 30
+        elif i == 7:
+            x = start_x + spacing_x + 30
+            y = 30
+        elif i == 8:
+            x = start_x + 30
+            y = start_y + spacing_y - 20
+        elif i == 9:
+            x = start_x + spacing_x + 30
+            y = start_y + spacing_y - 20
+        else:
+            x = start_x + (i % 2) * spacing_x + 30  
+            y = start_y + (i // 2) * spacing_y 
+        
+        pdf.table(planet, x, y,path,colors[i])
+        
+    pdf.AddPage(path)
+    pdf.set_font('Karma-Heavy', '', 22)
+    pdf.set_y(20)
+    pdf.cell(0,0,f"{name}'s Favorable Times",align='C') 
+    
+    i = 0
+    
+    for d,b in dasa.items():
+        if i == 0:
+            x = 20
+            y = 20
+        if i == 1:
+            x = 80
+            y = 20
+        if i == 2:
+            x = 140
+            y = 20
+            
+        if i == 3:
+            x = 20
+            y = 145
+            
+        if i == 4:
+            x = 80
+            y = 145
+            
+        if i == 5:
+            x = 140
+            y = 145
+            
+        if i == 6:
+            pdf.AddPage(path)
+            x = 20
+            y = 15
+        
+        if i == 7:
+            x = 80
+            y = 15
+        
+        if i == 8:
+            x = 140
+            y = 15
+        
+        if i == 0:
+            start_age = 0
+            end_age =  int(b[-1]['end_year']) - year
+        else:
+            start_age =  int(b[0]['end_year']) - year
+            end_age =  int(b[-1]['end_year']) - year 
+        i = i + 1
+        pdf.setDasa(d,b,x,y,start_age,end_age,path)
+        
+    data = {
+        "Favourable": "#DAFFDC",
+        "Unfavourable": "#FFDADA",
+        "Moderate": "#DAE7FF"
+    }
+        
+    pdf.set_font('Karma-Heavy', '', 22)
+    pdf.set_xy(22.5,pdf.get_y() + 20)
+    pdf.cell(pdf.w - 45,0,f"Note:",align='L')
+    for i,(label,value) in enumerate(data.items()):
+        pdf.set_y(pdf.get_y() + 20)
+        pdf.set_fill_color(*hex_to_rgb(value))
+        pdf.rect(40,pdf.get_y() - 6,8,8,round_corners=True,corner_radius=5,style='F')
+        pdf.set_font('Karma-Semi', '', 16)
+        pdf.set_text_color(0,0,0)
+        pdf.text(55,pdf.get_y(),f'{label}')
+        
+    pdf.AddPage(path)
+    pdf.set_xy(20,20)
+    pdf.set_font('Karma-Heavy', '' , 26)
+    pdf.set_text_color(hex_to_rgb("#966A2F"))
+    pdf.multi_cell(pdf.w - 40 , 10, f"{name}'s Five Natural Elements", align='C')
+    elements = {
+        "Fire": 0,
+        "Earth": 0,
+        "Air": 0,
+        "Water" : 0 
+    }
+    
+    for pla in planets:
+        for d,k in elements.items():
+            if pla['Name'] == "Ascendant" or pla['Name'] == "Rahu" or pla['Name'] == "Ketu":
+                continue
+            if pla['sign'] in elements_data[d]:
+                elements[d] = elements[d] + 1 
+    for d,k in elements.items():
+        elements[d] = (elements[d] / 7) * 100
+                
+    max_key1 = max(elements, key=elements.get)
+    
+    max_value2 = 0
+    max_key2 = ""
+    
+    for k,v in elements.items():
+        if k == max_key1:
+            continue
+        
+        if v > max_value2:
+            max_value2 = v
+            max_key2 = k
+    
+    dominantElementData = elements_content[max_key1]
+    
+    pdf.set_text_color(hex_to_rgb("#04650D"))
+    pdf.set_fill_color(hex_to_rgb("#BAF596"))
+    pdf.set_draw_color(hex_to_rgb("#06FF4C"))
+    pdf.rect(22.5,pdf.get_y() + 5,pdf.w - 45,15,round_corners=True,corner_radius=5,style='DF')
+    pdf.set_y(pdf.get_y() + 5)
+    pdf.set_font_size(14)
+    pdf.cell(0,15,f"{name}'s Dominant Element are {max_key1} and {max_key2}",align='C') 
+    
+    pdf.set_font('Karma-Regular', '', 16) 
+    roundedBox(pdf,"#FFF2D7",20,pdf.get_y() + 20, pdf.w - 40,pdf.no_of_lines(dominantElementData[0],pdf.w - 45) * 8 + 5)
+    pdf.set_xy(23.5,pdf.get_y() + 22.5)
+    pdf.set_text_color(0,0,0)
+    pdf.multi_cell(pdf.w - 45,8,dominantElementData[0],align='L')
+        
+    colors = [
+        "#FF0000",
+        "#43A458",
+        "#B1DC36",
+        "#4399FF"
+    ]
+
+    x_start = 20
+    y_base = pdf.get_y() + 75
+    bar_width = 20
+    bar_spacing = 10
+    max_height = 50
+
+    pdf.draw_bar_chart(x_start, y_base, bar_width, bar_spacing, elements, colors, max_height, path)
+    
+    y = pdf.get_y() - 45
+    for i,(label,value) in enumerate(elements.items()):
+        pdf.set_font('Karma-Semi', '', 18)
+        pdf.set_text_color(*hex_to_rgb(colors[i]))
+        pdf.text(150,y,f'{label}: {value:.2f}%')
+        y += 15
+    
+    pdf.set_text_color(0,0,0)
+    pdf.set_y(pdf.get_y() + 15)
+    
+    pdf.cell(0,0,"Impacts on Personality",align='C')
+    pdf.set_font("Times", '', 14)
+    pdf.set_xy(22.5,pdf.get_y() + 5)
+    pdf.multi_cell(pdf.w - 45, 8, f"**Strength** : {dominantElementData[1][0]}, {dominantElementData[1][1]}, {dominantElementData[1][2]}, {dominantElementData[1][3]}",align='L',markdown=True)
+    pdf.set_xy(22.5,pdf.get_y())
+    pdf.set_font("Times", '', 14)
+    pdf.multi_cell(pdf.w - 45, 8, f"**Challenges** : {dominantElementData[2][0]}, {dominantElementData[2][1]}, {dominantElementData[2][2]}, {dominantElementData[2][3]}",align='L',markdown=True)
+    
+    pdf.set_y(pdf.get_y() + 10)
+    pdf.set_font('Karma-Semi', '', 16)
+    pdf.cell(0,0,f"Parenting Tips to Balance {max_key1} Element", align='C')	
+    pdf.set_xy(22.5,pdf.get_y() + 10)
+    pdf.set_font("Times", '', 14)
+    pdf.multi_cell(pdf.w - 45, 8, f"    **{dominantElementData[3]['title']}** : {dominantElementData[3]['desc']}",align='L',markdown=True)
+    
+    pdf.AddPage(path)
+    pdf.set_xy(20,20)
+    pdf.set_font('Karma-Heavy', '' , 26)
+    pdf.set_text_color(hex_to_rgb("#966A2F"))
+    pdf.multi_cell(pdf.w - 40 , 10, f"{name}'s  Ayurvedic Body Type", align='C')
+    pdf.set_text_color(hex_to_rgb("#04650D"))
+    pdf.set_fill_color(hex_to_rgb("#BAF596"))
+    pdf.set_draw_color(hex_to_rgb("#06FF4C"))
+    pdf.rect(22.5,pdf.get_y() + 5,pdf.w - 45,15,round_corners=True,corner_radius=5,style='DF')
+    pdf.set_y(pdf.get_y() + 5)
+    pdf.set_font_size(14)
+    lagna = list(filter(lambda x : x['Name'] == "Ascendant",planets))[0]
+    data = {
+        "Pitta": (int(constitutionRatio[moon['zodiac_lord']]['Pitta']) + int(constitutionRatio[lagna['zodiac_lord']]['Pitta'])) / 200 * 100,
+        "Kapha": (int(constitutionRatio[moon['zodiac_lord']]['Kapha']) + int(constitutionRatio[lagna['zodiac_lord']]['Kapha'])) / 200 * 100,
+        "Vadha": (int(constitutionRatio[moon['zodiac_lord']]['Vata']) + int(constitutionRatio[lagna['zodiac_lord']]['Vata'])) / 200 * 100,
+    }
+    
+    maxValue = max(data, key=data.get)
+    constitutionMax = Constitution[maxValue]
+    pdf.cell(0,15,f"{name}'s Body is Dominated by {maxValue} Nature",align='C') 
+    
+    
+    pdf.set_font('Karma-Regular', '', 14) 
+    roundedBox(pdf,"#D7ECFF",20,pdf.get_y() + 20,pdf.w - 40,pdf.no_of_lines(constitutionMax[0],pdf.w - 45) * 8 + 5)
+    pdf.set_xy(22.5,pdf.get_y() + 22.5)
+    pdf.set_text_color(0,0,0)
+    pdf.multi_cell(pdf.w - 45,8,f"{constitutionMax[0]}",align='L')
+    
+    colors = [
+        "#E34B4B",   
+        "#43C316",   
+        "#4BDAE3"    
+    ]
+
+    x_start = 30
+    y_base = pdf.get_y() + 60
+    bar_width = 20
+    bar_spacing = 20
+    max_height = 40
+
+    pdf.draw_bar_chart(x_start, y_base, bar_width, bar_spacing, data, colors, max_height,path)
+    pdf.set_y(pdf.get_y() - 35)
+    for i,(label,value) in enumerate(data.items()):
+        pdf.set_font('Karma-Semi', '', 18)
+        pdf.set_text_color(*hex_to_rgb(colors[i]))
+        pdf.text(150,pdf.get_y(),f'{label}: {value:.2f}%')
+        pdf.set_y(pdf.get_y() + 15)
+        
+    pdf.set_text_color(0,0,0)
+    pdf.set_y(pdf.get_y() + 10)
+    pdf.set_font('Karma-Semi', '', 16)
+    pdf.cell(0,0,"Impacts on Body Type, Emotions, and Health",align='C')
+    
+    pdf.set_font("Times", '', 14)
+    pdf.set_xy(22.5,pdf.get_y() + 5)
+    pdf.multi_cell(pdf.w - 45, 8, f"**Body Type** : {constitutionMax[1]}",align='L',markdown=True)
+    pdf.set_xy(22.5,pdf.get_y())
+    pdf.set_font("Times", '', 14)
+    pdf.multi_cell(pdf.w - 45, 8, f"**Emotions** : {constitutionMax[2]}",align='L',markdown=True)
+    pdf.set_xy(22.5,pdf.get_y())
+    pdf.set_font("Times", '', 14)
+    pdf.multi_cell(pdf.w - 45, 8, f"**Health** : {constitutionMax[3]}",align='L',markdown=True)
+    
+    pdf.set_y(pdf.get_y() + 10)
+    pdf.set_font('Karma-Semi', '', 16)
+    pdf.cell(0,0,f"Parenting Tips to Balance {max_key1} Dosha", align='C')	
+    pdf.set_xy(22.5,pdf.get_y() + 10)
+    pdf.set_font("Times", '', 14)
+    pdf.multi_cell(pdf.w - 45, 8, f"    **{constitutionMax[4]['title']}** : {constitutionMax[4]['desc']}",align='L',markdown=True)
+    
+    
+    DesignColors = ["#BDE0FE", "#FEFAE0", "#FFC8DD", "#CAF0F8", "#FBE0CE", "#C2BCFF", "#9DE3DB", "#EDBBA3", "#EDF2F4", "#FFD6A5" , "#CBF3DB", "#94D8FD", "#DEE2FF", "#FEEAFA", "#D7AEFF", "#EEE4E1"]
+    
+    chakrasOrder = ["Root Chakra","Sacral Chakra","Solar Plexus Chakra","Heart Chakra","Throat Chakra","Third Eye Chakra","Crown Chakra"]
+    
+    pdf.AddPage(path,f"{name}'s Chakras")
+    pdf.set_text_color(0,0,0)
+    pdf.set_font_size(18)
+    childChakras = chakras[planets[0]['sign']][0]
+    chakrasContent = chakra_desc[childChakras]
+    pdf.set_xy(20,pdf.get_y() + 10)
+    pdf.multi_cell(pdf.w - 40,8,f"{name}'s Dominant Chakra is {childChakras}",align='C')
+    pdf.set_font('Karma-Regular', '', 14)
+    pdf.set_xy(20,pdf.get_y() + 10)
+    pdf.multi_cell(pdf.w - 40,8,f"      {chakrasContent[0]}",align='L')
+    pdf.set_font("Karma-Heavy", '', 16)
+    pdf.set_xy(22.5, pdf.get_y() + 5)
+    pdf.multi_cell(pdf.w - 45,8, chakrasContent[1],align='C')
+    if chakrasOrder.index(childChakras) in [5,6]:
+        pdf.image(f"{path}/babyImages/chakra_{chakrasOrder.index(childChakras) + 1}.png",pdf.w / 2 - 20,pdf.get_y() + 5 ,40,0)
+    else:
+        pdf.image(f"{path}/babyImages/chakra_{chakrasOrder.index(childChakras) + 1}.png",pdf.w / 2 - 15,pdf.get_y() + 10 ,30,0)
+    pdf.set_y(pdf.get_y() + 55)
+    pdf.set_font('Karma-Heavy', '', 22)
+    pdf.cell(0,0,f"{childChakras}",align='C')
+    pdf.set_xy(22.5,pdf.get_y() + 10)   
+    pdf.set_font('Karma-Semi', '', 16)
+    pdf.multi_cell(pdf.w - 45,8,f"Parenting Tips to Increase {name}'s Aura and Energy Level",align='C')
+    pdf.set_xy(22.5, pdf.get_y() + 10)
+    pdf.set_font('Times', '' , 14)
+    pdf.multi_cell(pdf.w - 45,8,f"          **{chakrasContent[2]['title']}** : {chakrasContent[2]['desc']}",align='L',markdown=True)
+
+    pdf.AddPage(path,f"{name}'s True Self")
+    pdf.set_xy(20,pdf.get_y() + 10)
+    pdf.set_text_color(0,0,0)
+    pdf.set_font_size(18)
+    pdf.multi_cell(pdf.w - 40,8,f"Let's take a look at the three most influential and important sign for {name}!",align='C')
+    pdf.set_font('Karma-Semi', '', 18)
+    pdf.set_xy(30,pdf.get_y() + 10)
+    pdf.cell(0,0,f"As per {name}'s kundli,")
+    y = pdf.get_y() + 10
+    roundedBoxBorder(pdf,"#FFE769","#C5A200",20,y,planets[1]['Name'],planets[1]['sign'],path)
+    roundedBoxBorder(pdf,"#D1C4E9","#A394C6",80,y,planets[0]['Name'],planets[0]['sign'],path)
+    roundedBoxBorder(pdf,"#B3E5FC","#82B3C9",140,y,planets[2]['Name'],planets[2]['sign'],path)
+    pdf.set_y(pdf.get_y() + 10)
+    
+    content = {'child_personality': lagnaIdentity[planets[0]['sign']].replace("child",name).replace("Child",name), 'emotional_needs': moonIdentity[planets[2]['sign']].replace("child",name).replace("Child",name), 'core_identity': sunIdentity[planets[1]['sign']].replace("child",name).replace("Child",name)}
+    
+    trueTitle = {
+        "child_personality" : f"{name}'s Personality",
+        "emotional_needs" : f"{name}'s Emotions",
+        "core_identity" : f"{name}'s Core Identity"
+    }
+    
+    for index , (k, v) in enumerate(content.items()):
+        if pdf.get_y() + 30 >= 260:  
+            pdf.AddPage(path)
+            pdf.set_y(20)
+            
+        pdf.ContentDesign(random.choice(DesignColors),trueTitle[k],v,path,name)
+    
+        
+    pdf.AddPage(path,f"Panchangam: A Guide to {name}'s Flourishing Future")
+    pdf.set_font('Karma-Regular', '' , 14)
+    pdf.set_text_color(0,0,0)
+    pdf.set_xy(22.5,pdf.get_y() + 5)
+    pdf.multi_cell(pdf.w - 45, 8 , "Activating the Panchangam elements (Thithi, Vaaram, Nakshatra, Yogam, Karanam) can potentially bring balance to child's life, fostering positive energies and promoting growth.", align='L')
+    pdf.set_y(pdf.get_y() + 5)
+    pdf.lineBreak(f"{name} was born on {formatted_date}, {panchang['week_day']} (Vaaram), under {panchang['nakshatra']} Nakshatra, {panchang['paksha']} Paksha {panchang['thithi']} Thithi, {panchang['karanam']} Karanam, and {panchang['yoga']} Yogam",path, "#BAF596")
+    
+    colors = ["#E5FFB5","#94FFD2","#B2E4FF","#D6C8FF","#FFDECA"]    
+    titles = [f"Tithi Represents {name}'s Emotions, Mental Well-being",f"Vaaram Represents {name}'s Energy & Behaviour",f"Nakshatra Represents {name}'s Personality and Life Path",f"Yogam Represents {name}'s Prosperity and Life Transformation",f"Karanam Represents {name}'s Work and Actions"]
+    
+    titleImage = ['waningMoon.png' if panchang['thithi_number'] <= 15 else 'waxingMoon.png','week.png','nakshatra.png','yogam.png','karanam.png']
+    
+    panchangContent = [
+        "",
+        "",
+        "Magizh, born under the Bharani Nakshatra, possesses a dynamic and determined personality. He is known for his strong willpower, ambitious nature, and unwavering focus on achieving his goals. Magizh is often seen as a natural leader, with a charismatic presence that draws others towards him. His life path is marked by transformation and growth, as he navigates challenges with resilience and adaptability. Overall, Magizh's Bharani Nakshatra characteristics make him a force to be reckoned with, capable of achieving great success and making a lasting impact in the world.",
+        "Magizh, born under the Shiva Yogam, possesses a deep connection to spirituality and a strong sense of inner peace and tranquility. His goals revolve around achieving spiritual growth, enlightenment, and self-realization. With a profound understanding of the interconnectedness of all things, Magizh strives to spread positivity and uplift others around him, leaving a lasting impact of harmony and balance wherever he goes.",
+        ""
+    ]
+    
+    pdf.set_text_color(0,0,0)
+    pdf.set_y(pdf.get_y() + 5)
+    for i in range(0,5):
+        if pdf.get_y() + 50 >= 260:
+            pdf.AddPage(path)
+            pdf.set_y(30)
+        pdf.image(f"{path}/babyImages/{titleImage[i]}",pdf.w / 2 - 10,pdf.get_y() + 5,20,20) 
+        pdf.set_y(pdf.get_y() + 25)
+        
+        if i == 0:
+            positive = thithiContent[panchang['thithi']][0]
+            negative = thithiContent[panchang['thithi']][1]
+            tips = thithiContent[panchang['thithi']][2]
+            
+    
+            pdf.set_xy(22.5,pdf.get_y() + 5)
+            pdf.set_font('Karma-Semi', '', 18)
+            pdf.multi_cell(pdf.w - 45, 8,titles[i], align='C')
+            pdf.set_xy(22.5,pdf.get_y() + 5)
+            pdf.set_font('Karma-Regular', '', 14)
+            pdf.multi_cell(pdf.w - 45,7,f"{name} was born under {panchang['paksha']} {panchang['thithi']}, and the following are Thithi impacts on {name}'s Life ",align='C')
+            y = pdf.get_y() + 5
+            pdf.set_xy(20,y)
+            pdf.set_fill_color(hex_to_rgb("#DAFFDC"))
+            pdf.set_font('Karma-Semi', '', 16)
+            
+            pdf.checkNewPage(path)
+            data = [
+                (f"Strength",f"Challenges"),
+                (positive[0],negative[0]),
+                (positive[1],negative[1]),
+                (positive[2],negative[2])
+            ]
+            
+            pdf.panchangTable(data)
+                
+            if pdf.get_y() + 20 > 270:
+                pdf.AddPage(path)
+                pdf.set_y(20)
+            pdf.set_xy(30,pdf.get_y() + 10)
+            pdf.set_fill_color(hex_to_rgb(random.choice(DesignColors)))
+            pdf.set_font("Times", '', 14)
+            pdf.cell(pdf.w - 60,10,f"Thithi Lord: **{thithiLord[panchang['thithi']]}**",align='C',fill=True,new_y=YPos.NEXT,markdown=True)
+                
+            pdf.set_font("Times", '', 14)
+            pdf.set_xy(22.5,pdf.get_y() + 5)
+            pdf.multi_cell(pdf.w - 45,7,f"**Parenting Tips** : {tips['Name']} {tips['Description']} {tips['Execution']}",align='L',markdown=True)
+            pdf.set_y(pdf.get_y() + 10)
+            
+        elif i == 1:
+            positive = weekPlanetContent[panchang['week_day']][0]
+            negative = weekPlanetContent[panchang['week_day']][1]
+            tips = weekPlanetContent[panchang['week_day']][2]
+            pdf.checkNewPage(path)
+            
+            pdf.set_xy(22.5,pdf.get_y() + 5)
+            pdf.set_font('Karma-Semi', '', 18)
+            pdf.multi_cell(pdf.w - 45, 8,titles[i], align='C')
+            pdf.set_xy(22.5,pdf.get_y() + 5)
+            pdf.set_font('Karma-Regular', '', 14)
+            pdf.multi_cell(pdf.w - 45,7,f"{name} was born on {panchang['week_day']}, and the following are its impacts on {name}'s life:",align='C')
+            pdf.checkNewPage(path)
+            
+            pdf.checkNewPage(path)
+            data = [
+                (f"Strength",f"Challenges"),
+                (positive[0],negative[0]),
+                (positive[1],negative[1]),
+                (positive[2],negative[2])
+            ]
+            
+            pdf.panchangTable(data)         
+                
+            pdf.checkNewPage(path)
+            pdf.set_font("Times", '', 14)
+            roundedBox(pdf,random.choice(DesignColors),40,pdf.get_y() + 5,pdf.w - 80,10)
+            pdf.set_xy(30,pdf.get_y() + 5)
+            pdf.cell(pdf.w - 60,10,f"Rulling Planet: **{weekPlanet[panchang['week_day']]}**",align='C',new_y=YPos.NEXT,markdown=True)
+            
+            pdf.set_xy(22.5,pdf.get_y() + 5)
+            pdf.multi_cell(pdf.w - 45,7,f"**Parenting Tips** : {tips['Tip']} {tips['Execution']}",align='L',markdown=True)
+            pdf.set_y(pdf.get_y() + 10)
+            
+        elif i == 4:
+            positive = karanamContent[panchang['karanam']][0]
+            negative = karanamContent[panchang['karanam']][1]
+            tips = karanamContent[panchang['karanam']][2]
+            
+            pdf.checkNewPage(path)
+            
+            pdf.set_xy(22.5,pdf.get_y() + 5)
+            pdf.set_font('Karma-Semi', '', 18)
+            pdf.multi_cell(pdf.w - 45, 8,titles[i], align='C')
+            pdf.set_xy(22.5,pdf.get_y() + 5)
+            pdf.set_font('Karma-Regular', '', 14)
+            pdf.multi_cell(pdf.w - 45,7,f"{name} was born under {panchang['karanam']}, and the following are Karanm impacts on {name}'s life:",align='C')
+            pdf.checkNewPage(path)
+            
+            data = [
+                (f"Strength",f"Challenges"),
+                (positive[0],negative[0]),
+                (positive[1],negative[1]),
+                (positive[2],negative[2])
+            ]
+            
+            pdf.panchangTable(data)            
+            pdf.checkNewPage(path)
+            pdf.set_font("Times", '', 14)
+            pdf.set_xy(22.5,pdf.get_y() + 5)
+            pdf.multi_cell(pdf.w - 45,7,f"**Parenting Tips** : {tips['Tip']} {tips['Execution']}",align='L',markdown=True)
+            pdf.set_y(pdf.get_y() + 10)
+        else:
+            # con = panchangPrompt(panchang,i,name,gender)
+            con = panchangContent[i]
+            pdf.ContentDesign(random.choice(DesignColors),titles[i],con,path,name)
+            
+    asc = list(filter(lambda x: x['Name'] == 'Ascendant', planets))[0]
+    moon = list(filter(lambda x: x['Name'] == 'Moon', planets))[0]
+    
+            
+    sifted = zodiac[zodiac.index(asc['sign']):] + zodiac[:zodiac.index(asc['sign'])]
+    pdf.AddPage(path,"Potential Health Challenges and Holistic Wellness Solutions")
+    sixth_house = sifted[5]
+    con = healthContent[sixth_house]
+    insights = healthInsights[sixth_house].replace("child",name)
+    pdf.set_y(pdf.get_y() + 5)
+    pdf.set_font('Karma-Regular', '', 14)
+    pdf.set_text_color(0,0,0) 
+    pdf.roundedContent(insights,random.choice(DesignColors))
+    color = random.choice(DesignColors)
+    color2 = random.choice(DesignColors)
+    col_width = pdf.w / 2 - 10 - 2.5
+    
+    pdf.set_xy(20, pdf.get_y() + 12.5)
+    pdf.set_font('Karma-Semi', '' , 18)
+    pdf.cell(0,0,"Health Issues Based on", align='C')
+    x = 10 + col_width
+    y = pdf.get_y()
+    roundedBox(pdf, color, 10 , pdf.get_y() + 5, col_width, 40)
+    roundedBox(pdf, color2 , x + 5 , pdf.get_y() + 5, col_width, 40)
+    pdf.set_xy(12.5,pdf.get_y() + 7.5)
+    pdf.set_font('Karma-Semi', '' , 15)
+    pdf.cell(col_width - 5,8, f"Common Health Issues",align='C')
+    pdf.set_xy(12.5, pdf.get_y() + 8)
+    pdf.set_font("Times", '' , 14)
+    for index,c in enumerate(con[0]):
+        text = str(c).split(" (")   
+        if index < len(con[0]) - 2:
+            roundedBox(pdf,color,10, pdf.get_y() + 2.5, col_width, pdf.no_of_lines(f"{index + 1}) {text[0]} ({text[1]}", col_width - 5) * 8 + 8, status=False)
+        elif index == len(con[0]) - 2:
+            roundedBox(pdf,color,10, pdf.get_y() + 2.5, col_width, pdf.no_of_lines(f"{index + 1}) {text[0]} ({text[1]}", col_width - 5) * 8 + 5, status=False)
+        else:
+            roundedBox(pdf,color,10, pdf.get_y() + 2.5, col_width, pdf.no_of_lines(f"{index + 1}) {text[0]} ({text[1]}", col_width - 5) * 8 + 2.5)
+        pdf.multi_cell(col_width - 5, 8 , f"{index + 1}) **{text[0]}** ({text[1]}" , align='L', new_x=XPos.LEFT, new_y=YPos.NEXT,markdown=True)
+    max_y1 = pdf.get_y()
+    pdf.set_xy(x + 7.5,y + 7.5)
+    pdf.set_font('Karma-Semi', '' , 15)
+    pdf.cell(col_width - 5,8, f"Dosha Constitution Issues",align='C')
+    pdf.set_xy(x + 7.5, pdf.get_y() + 8)
+    pdf.set_font("Times", '' , 14)
+    for index,c in enumerate(con[1]):
+        text = str(c).split(" (")   
+        if index != len(con[1]) - 1:
+            roundedBox(pdf,color2,x + 5, pdf.get_y() + 2.5, col_width, pdf.no_of_lines(f"{index + 1}) {text[0]} ({text[1]}", col_width - 5) * 8 + 8, status=False)
+        else:
+            roundedBox(pdf,color2,x + 5, pdf.get_y() + 5, col_width, pdf.no_of_lines(f"{index + 1}) {text[0]} ({text[1]}", col_width - 5) * 8 + 2.5)
+            roundedBox(pdf,color2,x + 5, pdf.get_y() + 2.5, col_width, 8, status=False)
+                
+        pdf.multi_cell(col_width - 5, 8 , f"{index + 1}) **{text[0]}** ({text[1]}" , align='L', new_x=XPos.LEFT, new_y=YPos.NEXT,markdown=True)
+    max_y2 = pdf.get_y()
+    
+    pdf.set_y(max(max_y1,max_y2))    
+    pdf.checkNewPage(path)
+    content = con[3]['natural']
+    pdf.set_y(pdf.get_y() + 20)
+    pdf.set_font('Karma-Heavy', '' , 18)
+    pdf.cell(0,0, f"Remedial Practices",align='C')
+    pdf.set_font_size(16)
+    title = [
+        "Natural Ayurvedic Remedy",
+        "Mudra Practice Remedy",
+        "Mindful Food & Diet Remedy"
+    ]
+    pdf.set_y(pdf.get_y() + 5)
+    colors = ["#CBF3DB","#FFD6A5", "#DEE2FF"]
+    for i,t in enumerate(title): 
+        pdf.set_xy(30,pdf.get_y())
+        roundedBox(pdf,colors[i], pdf.w / 2 - 50, pdf.get_y(), 100, 10, corner=20)
+        pdf.cell(pdf.w - 60,10,t,align='C')
+        pdf.set_y(pdf.get_y() + 15)
+    
+    pdf.AddPage(path)
+    pdf.set_y(20)
+    color = colors[0]
+    roundedBox(pdf, color, 20, pdf.get_y() + 7.5, pdf.w - 40, 50)
+    pdf.image(f"{path}/babyImages/ayur.png",pdf.w / 2 - 10,pdf.get_y() + 7.5,20,20)
+    pdf.set_y(pdf.get_y() + 32.5)
+    pdf.cell(0,0,"Natural Ayurvedic", align='C')
+    pdf.set_font('Karma-Regular', '' , 14) 
+    roundedBox(pdf, color, 20, pdf.get_y() + 5, pdf.w - 40, 20)
+    pdf.set_xy(22.5, pdf.get_y() + 5)
+    pdf.multi_cell(pdf.w - 45, 8 , content[0], align='C')
+    pdf.set_font('Times', '' , 14)
+    roundedBox(pdf, color, 20, pdf.get_y() + 5, pdf.w - 40, pdf.no_of_lines(f"Ingredients: {content[1]}", pdf.w - 45)* 8 + 8)
+    pdf.set_xy(22.5, pdf.get_y() + 5)
+    pdf.multi_cell(pdf.w - 45, 8 , f"**Ingredients:** {content[1]}",markdown=True)
+    roundedBox(pdf, color, 20, pdf.get_y(), pdf.w - 40, pdf.no_of_lines(f"How to Make: {content[2]}", pdf.w - 45)* 8 + 8,status=False)
+    pdf.set_xy(22.5, pdf.get_y())
+    pdf.multi_cell(pdf.w - 45, 8 , f"**How to Make:** {content[2]}",markdown=True)
+    roundedBox(pdf, color, 20, pdf.get_y(), pdf.w - 40, pdf.no_of_lines(f"Benefits: {content[3]}", pdf.w - 45)* 8 + 5)
+    roundedBox(pdf, color, 20 , pdf.get_y(), pdf.w - 40, 5, status=False)
+    pdf.set_xy(22.5, pdf.get_y())
+    pdf.multi_cell(pdf.w - 45, 8 , f"**Benefits:** {content[3]}",markdown=True)
+    
+    content = con[3]['mudra']
+    color = colors[1]
+    pdf.set_font('Karma-Semi', '' , 16)
+    pdf.set_xy(22.5,pdf.get_y() + 20)
+    roundedBox(pdf, color, 20, pdf.get_y(), pdf.w - 40, 60)
+    pdf.image(f"{path}/babyImages/mudra.png",pdf.w / 2 - 10,pdf.get_y() + 7.5,20,20)
+    pdf.set_y(pdf.get_y() + 35)
+    pdf.cell(0,0,"Mudra Practice Remedy", align='C')
+    pdf.set_font('Karma-Regular', '' , 14) 
+    pdf.set_xy(22.5, pdf.get_y() + 5)
+    pdf.multi_cell(pdf.w - 45, 8 , content[0], align='C')
+    roundedBox(pdf, color, 20, pdf.get_y(), pdf.w - 40, 20,status=False)
+    pdf.set_font('Karma-Semi', '' , 16)
+    pdf.set_xy(22.5,pdf.get_y() + 5)
+    pdf.cell(0,0,"Steps",align='L')
+    pdf.set_y(pdf.get_y() + 5)
+    pdf.set_font('Karma-Regular', '' , 14)
+    for i,n in enumerate(content[1]):
+        if pdf.get_y() + pdf.no_of_lines(f"{index}) {n}", pdf.w - 60) * 8 > 270:
+            pdf.AddPage(path)
+            pdf.set_y(20) 
+        roundedBox(pdf, color, 20, pdf.get_y() + 5, pdf.w - 40, pdf.no_of_lines(f"{i + 1}) {n}",pdf.w - 60) * 8 + 8,status=False)
+        pdf.set_xy(30, pdf.get_y() + 2.5)
+        pdf.multi_cell(pdf.w - 60, 8 , f"{i + 1}) {n}" , align='L')
+    pdf.set_font('Times', '' , 14)
+    roundedBox(pdf,color,20,pdf.get_y() + 5, pdf.w - 40, pdf.no_of_lines(f"Benefits: {content[2]}",pdf.w - 45) * 8 + 5)
+    pdf.set_xy(22.5, pdf.get_y() + 5)
+    pdf.multi_cell(pdf.w - 45, 8 , f"**Benefits:** {content[2]}",markdown=True)
+        
+    pdf.AddPage(path)
+    pdf.set_font('Karma-Semi', '' , 16)
+    pdf.set_y(pdf.get_y() + 10)
+    roundedBox(pdf, color, 20, pdf.get_y(), pdf.w - 40, 60)
+    pdf.image(f"{path}/babyImages/food.png",pdf.w / 2 - 10,pdf.get_y() + 2.5,20,20)
+    pdf.set_y(pdf.get_y() + 32.5)
+    pdf.cell(0,0,"Mindful Food & Diet Remedy", align='C')
+    content = healthContent[sixth_house][3]['foods']
+    pdf.set_font('Karma-Heavy', '' , 16) 
+    pdf.image(f"{path}/babyImages/tick.png",22.5,pdf.get_y() + 10,10,10)
+    pdf.set_xy(32.5, pdf.get_y() + 10)
+    pdf.cell(0,10,"Food to Include", align='L')
+    pdf.set_y(pdf.get_y() + 7.5)
+    pdf.set_font('Karma-Regular', '' , 14) 
+    for i,n in enumerate(content[0]):
+        if pdf.get_y() + pdf.no_of_lines(f"{index}) {n}", pdf.w - 60) * 8 > 270:
+            pdf.AddPage(path)
+            pdf.set_y(20) 
+        roundedBox(pdf, color, 20, pdf.get_y() + 2.5, pdf.w - 40, pdf.no_of_lines(f"{i + 1}) {n}",pdf.w - 60) * 8 + 8,status=False)
+        pdf.set_xy(30, pdf.get_y() + 2.5)
+        pdf.multi_cell(pdf.w - 60, 8 , f"{i + 1}) {n}" , align='L')
+    roundedBox(pdf, color, 20, pdf.get_y() + 2.5, pdf.w - 40, 15,status=False)
+    pdf.image(f"{path}/babyImages/cancel.png",22.5,pdf.get_y() + 5,10,10)
+    pdf.set_xy(32.5, pdf.get_y() + 5)
+    pdf.set_font('Karma-Heavy', '' , 16) 
+    pdf.cell(0,10,"Food to Avoid", align='L')
+    pdf.set_y(pdf.get_y() + 7.5)
+    pdf.set_font('Karma-Regular', '' , 14) 
+    for i,n in enumerate(content[1]):
+        if pdf.get_y() + pdf.no_of_lines(f"{index}) {n}", pdf.w - 60) * 8 > 270:
+            pdf.AddPage(path)
+            pdf.set_y(20) 
+        roundedBox(pdf, color, 20, pdf.get_y() + 2.5, pdf.w - 40, pdf.no_of_lines(f"{i + 1}) {n}",pdf.w - 60) * 8 + 8,status=False)
+        pdf.set_xy(30, pdf.get_y() + 2.5)
+        pdf.multi_cell(pdf.w - 60, 8 , f"{i + 1}) {n}" , align='L')
+    roundedBox(pdf, color, 20, pdf.get_y() + 2.5, pdf.w - 40, 15,status=False)
+    pdf.image(f"{path}/babyImages/guide.png",22.5,pdf.get_y() + 5,10,10)
+    pdf.set_xy(32.5, pdf.get_y() + 5)
+    pdf.set_font('Karma-Heavy', '' , 16) 
+    pdf.cell(0,10,"Execution Guide", align='L')
+    pdf.set_y(pdf.get_y() + 7.5)
+    pdf.set_font('Karma-Regular', '' , 14) 
+    for i,n in enumerate(content[2]):
+        if pdf.get_y() + pdf.no_of_lines(f"{index}) {n}", pdf.w - 60) * 8 > 270:
+            pdf.AddPage(path)
+            pdf.set_y(20) 
+        roundedBox(pdf, color, 20, pdf.get_y() + 2.5, pdf.w - 40, pdf.no_of_lines(f"{i + 1}) {n}",pdf.w - 60) * 8 + 8,status=False)
+        pdf.set_xy(30, pdf.get_y() + 2.5)
+        pdf.multi_cell(pdf.w - 60, 8 , f"{i + 1}) {n}" , align='L')
+    pdf.set_font('Times', '' , 14)
+    roundedBox(pdf,color,20,pdf.get_y() + 5, pdf.w - 40, pdf.no_of_lines(f"Benefits: {content[3]}",pdf.w - 45) * 8 + 5)
+    pdf.set_xy(22.5, pdf.get_y() + 5)
+    pdf.multi_cell(pdf.w - 45, 8 , f"**Benefits:** {content[3]}",markdown=True)
+
+                
+    # content2 = physical(planets,2,name,gender)
+    # content3 = physical(planets,3,name,gender)
+    # content4 = physical(planets,4,name,gender)
+
+    content2 = {'physical_attributes': 'Magizh has a balanced body built with a charming face type. His eyes are expressive and hold a sense of harmony. His physical appearance exudes grace and elegance, while his aura is charismatic and magnetic, drawing others towards him.', 'personality': ['Magizh possesses a charming and diplomatic personality, which helps him navigate social situations with ease.', 'He has a strong sense of justice and fairness, making him a reliable and trustworthy individual.', 'Magizh is creative and artistic, with an eye for beauty and design.'], 'character': ['Magizh is cooperative and seeks harmony in all his interactions, making him a peacemaker in his social circles.', 'He is sociable and enjoys connecting with others, forming meaningful relationships.', 'Magizh is adaptable and can easily adjust to new environments and circumstances.'], 'positive_behavior': ['Magizh exhibits a sense of balance and equilibrium in his actions, making thoughtful decisions.', 'He values relationships and shows empathy towards others, creating a supportive environment.', 'Magizh is diplomatic in his communication, resolving conflicts peacefully and effectively.'], 'negative_behavior': ['Magizh may struggle with indecisiveness, finding it challenging to make firm choices.', 'He might have a tendency to avoid confrontation and suppress his true emotions.', 'Magizh could be overly focused on maintaining external harmony, neglecting his own needs and desires.'], 'parenting_tips': 'To help Magizh overcome his negative behaviors and support his growth, encourage him to express his opinions and feelings openly. Teach him the importance of setting boundaries and asserting himself when necessary. Provide opportunities for Magizh to practice decision-making and assertiveness skills, guiding him to prioritize his own well-being while maintaining harmonious relationships with others. Foster a supportive and nurturing environment that values both his diplomatic nature and his individual needs. Encourage Magizh to seek counseling or therapy if needed to address any underlying issues causing his avoidance of conflict and emotional suppression. Remember to praise and reinforce his efforts towards personal growth and self-expression.'}
+
+    content3 = {'emotional_state': 'Magizh, with the Moon positioned in the 7th house of Aries in Bharani nakshatra along with Planets Moon and Jupiter, tends to have a strong sense of independence and a need for personal space. Magizh believes in taking action and being assertive in order to achieve their goals. Emotionally, Magizh is passionate, determined, and sometimes impatient.', 'emotions': ['Passionate and enthusiastic in pursuing their desires', "Can become easily frustrated when things don't go as planned", 'Has a fiery and competitive spirit when faced with challenges'], 'feelings': ['Feels a strong sense of individuality and self-reliance', 'Experiences a drive to constantly seek new experiences and adventures', 'May feel restless or impulsive when restricted or confined'], 'reactions': ['Responds quickly to situations with courage and boldness', 'May become defensive when their independence is questioned', 'Takes the lead and initiates action in group settings'], 'negative_imbalance': ['Tendency towards impulsiveness leading to rash decision-making', "Difficulty in compromising and considering others' perspectives", 'Struggles with anger issues and maintaining harmony in relationships'], 'parenting_tips': "To support Magizh in managing their negative emotional imbalances and foster growth, it is important to encourage self-reflection and mindfulness. Parents can help Magizh by teaching them the importance of taking a pause before reacting impulsively. Encourage open communication and active listening to understand others' viewpoints. Provide outlets for physical activities to channel the excess energy positively. Set boundaries and teach conflict resolution skills to promote healthy relationships. Practice gratitude and positivity to cultivate emotional balance."}
+
+    content4 = {'core_insights': "Magizh, with the Sun positioned in the 3rd house of Sagittarius in Mula nakshatra, is driven by a deep desire for knowledge and intellectual pursuits. His core identity is centered around exploration, seeking truth and meaning, and expressing his beliefs with conviction. His inner strength lies in his optimism, curiosity, and adaptability, which enable him to navigate various challenges with a sense of adventure and purpose. However, Magizh's ego can sometimes be overly proud and self-righteous, leading to conflicts in relationships and a tendency to impose his views on others.", 'recognitions': ['Magizh seeks recognition for his intellectual achievements and philosophical insights.', 'He also craves acknowledgment for his ability to communicate persuasively and inspire others.', 'Magizh desires recognition for his adventurous spirit and willingness to explore new ideas and cultures.'], 'core_identity': ["Magizh's core identity is shaped by his quest for truth and wisdom.", 'His belief in the power of knowledge and education drives his actions and interactions with others.', "Magizh's identity is rooted in his philosophical nature, love for learning, and his ability to inspire those around him."], 'parenting_tips': 'Encourage Magizh to practice humility and empathy in his interactions with others. Teach him to listen actively, consider different perspectives, and appreciate the diversity of opinions and experiences. Guide Magizh to engage in meaningful conversations that foster understanding and mutual respect. By nurturing these qualities, Magizh can develop a more balanced sense of self and build stronger connections with those around him.'}
+    
+    content = [content2,content3,content4]
+    titles = [{
+        'physical_attributes': "Physical Attributes",
+        'personality': "Outer Personality", 
+        'character': "Character",
+        'positive_behavior': "Positive Behavior",
+        'negative_behavior': "Behavior Challenges",
+        'parenting_tips' : f"Parenting Tips For {name}'s Behaviour Challenges" 
+        }, {
+            'emotional_state' : f"{name}'s Emotional State Insights", 
+            'emotions': f"{name}'s Emotions",
+            'feelings' : f"{name}'s Feelings",
+            'reactions' : f"{name}'s Reactions",
+            'negative_imbalance' : f"{name}'s Emotional Imbalance Challenges",
+            'parenting_tips' : f"Parenting Tips"
+        },{
+            'core_insights' : f"{name}'s Soul Desire",
+            'recognitions' : f"Seek For Recognition", 
+            'core_identity': "Core Identity", 
+            'ego': f"{name}'s Soul Ego", 
+            'negative_ego': f"{name}'s Ego Challenges", 
+            'parenting_tips': f"Parenting Tips For Self Identity Challenges"
+         }]
+
+    pdf.AddPage(path,"Outer World - Physical Attributes, Personality, and Behavior")
+    pdf.set_text_color(0,0,0)
+        
+    for index,c in enumerate(content):
+        if index == 1:
+            pdf.AddPage(path,"Inner World - Emotional Needs and Soul Desire ")
+            
+        if pdf.get_y() + 40 >= 260:
+            pdf.AddPage(path)
+            pdf.set_y(30)
+        pdf.set_text_color(0, 0, 0)
+        if isinstance(c, str):
+            pdf.set_font('Karma-Semi', '', 18)
+            pdf.set_xy(45,pdf.get_y() + 10)
+            pdf.multi_cell(pdf.w - 90, 8, f"{titles[index]}", align='C')
+            pdf.set_font('Karma-Regular', '', 14)
+            pdf.set_xy(22.5,pdf.get_y() + 5)
+            pdf.multi_cell(pdf.w - 45, 7, f"        {c}", align='L')
+        else:
+            for k, v in c.items():
+                if pdf.get_y() + 40 >= 260:  
+                    pdf.AddPage(path)
+                    pdf.set_y(30)
+                pdf.ContentDesign(random.choice(DesignColors),titles[index][k],v,path,name)
+            
+    pdf.AddPage(path,f"{name}'s Education and Intellect")
+    pdf.set_font('Karma-Semi','', 16)
+    pdf.set_y(pdf.get_y() + 10)
+    pdf.cell(0,0,f"Insights about {name}'s education and intelligence",align='C')
+    pdf.set_font('Karma-Regular', '', 14)
+    
+    educationTitle = {
+        "insights" : "Education and Intellectual Insights",
+        "suitable_educational" : "Higher Education Preferences", 
+        "cognitive_abilities" : "Learning Approaches", 
+        "recommendations" : "How To Do It:"
+    }
+    
+    content = education[moon['sign']]
+
+    con = {'insights': content[0], 'suitable_educational': content[1], 'cognitive_abilities': content[2], 'recommendations': content[4]}
+    
+    pdf.set_text_color(0, 0, 0)
+    
+    for index,(k, v) in enumerate(con.items()):
+        if pdf.get_y() + 40 >= 260:  
+            pdf.AddPage(path)
+            pdf.set_y(30)
+        if index == 3:
+            if pdf.get_y() + 30 >= 260:
+                pdf.AddPage(path)
+                pdf.set_y(20)
+                
+            pdf.set_y(pdf.get_y())
+            pdf.image(f"{path}/icons/pg 33_personalized.png",pdf.w / 2 - 10,pdf.get_y(),20,20)
+            pdf.set_y(pdf.get_y() + 25)
+            pdf.set_font('Karma-Semi' , '' , 18)
+            pdf.cell(0,0,"Parenting Tip for Academic Excellence:", align='C')
+            pdf.set_font_size(15)
+            pdf.set_y(pdf.get_y() + 10) 
+            pdf.cell(0,0, content[3],align='C')
+            pdf.set_y(pdf.get_y() + 5)
+            
+            if pdf.get_y() + 40 >= 260:  
+                pdf.AddPage(path)
+                pdf.set_y(30)
+            
+        pdf.ContentDesign(random.choice(DesignColors),educationTitle[k],v,path,name)
+        
     pdf.AddPage(path,"Family and Relationships")
-    con = physical(planets,5,name,gender)
-    # con = {'family_relationship': "Based on Magizh's astrology details, it can be inferred that Magizh's social development, friendship dynamics, peer interactions, and family relationships are influenced by the placements of planets in the 7th House (Aries), 11th House (Leo), Sun (Sagittarius), Moon (Aries), and Venus (Libra). Magizh's family relationships are characterized by strong bonds with parents and siblings, with a focus on nurturing and supportive interactions. In terms of social development, Magizh tends to form friendships based on mutual respect and shared interests, seeking harmony and balance in relationships.", 'approaches': [{'title': 'Building Relationships with Father (Sun in Sagittarius)', 'content': 'Magizh can bond with the father by engaging in intellectual discussions, exploring new ideas and beliefs together, and participating in activities that promote personal growth and expansion of knowledge.'}, {'title': 'Bonding with Mother (Moon in Aries)', 'content': 'Magizh can connect with the mother through emotional expression, support in times of need, and engaging in physical activities together to foster a sense of closeness and security.'}, {'title': 'Strengthening Sibling Relationships', 'content': 'Magizh can enhance sibling relationships by fostering open communication, being supportive and understanding, and engaging in collaborative activities that promote mutual growth and bonding.'}, {'title': 'Developing Friendships', 'content': 'Magizh can build friendships by being a good listener, showing empathy and understanding, and participating in social activities that align with shared values and interests.'}], 'parenting_support': [{'title': 'Encouraging Open Communication', 'content': 'Parents can encourage Magizh to express thoughts and feelings openly, create a safe space for dialogue, and actively listen to his concerns and experiences to strengthen the parent-child relationship.'}, {'title': 'Promoting Independence', 'content': 'Parents can support Magizh in developing independence, decision-making skills, and autonomy by allowing him to take on responsibilities and make choices within a safe and supportive environment.'}, {'title': 'Cultivating Emotional Intelligence', 'content': "Parents can help Magizh develop emotional intelligence by teaching him to identify and manage his emotions, understand others' perspectives, and communicate effectively in various social settings."}]}
+    # con = physical(planets,5,name,gender)
+    con = {'family_relationship': "Based on Magizh's astrology details, it can be inferred that Magizh's social development, friendship dynamics, peer interactions, and family relationships are influenced by the placements of planets in the 7th House (Aries), 11th House (Leo), Sun (Sagittarius), Moon (Aries), and Venus (Libra). Magizh's family relationships are characterized by strong bonds with parents and siblings, with a focus on nurturing and supportive interactions. In terms of social development, Magizh tends to form friendships based on mutual respect and shared interests, seeking harmony and balance in relationships.", 'approaches': [{'title': 'Building Relationships with Father (Sun in Sagittarius)', 'content': 'Magizh can bond with the father by engaging in intellectual discussions, exploring new ideas and beliefs together, and participating in activities that promote personal growth and expansion of knowledge.'}, {'title': 'Bonding with Mother (Moon in Aries)', 'content': 'Magizh can connect with the mother through emotional expression, support in times of need, and engaging in physical activities together to foster a sense of closeness and security.'}, {'title': 'Strengthening Sibling Relationships', 'content': 'Magizh can enhance sibling relationships by fostering open communication, being supportive and understanding, and engaging in collaborative activities that promote mutual growth and bonding.'}, {'title': 'Developing Friendships', 'content': 'Magizh can build friendships by being a good listener, showing empathy and understanding, and participating in social activities that align with shared values and interests.'}], 'parenting_support': [{'title': 'Encouraging Open Communication', 'content': 'Parents can encourage Magizh to express thoughts and feelings openly, create a safe space for dialogue, and actively listen to his concerns and experiences to strengthen the parent-child relationship.'}, {'title': 'Promoting Independence', 'content': 'Parents can support Magizh in developing independence, decision-making skills, and autonomy by allowing him to take on responsibilities and make choices within a safe and supportive environment.'}, {'title': 'Cultivating Emotional Intelligence', 'content': "Parents can help Magizh develop emotional intelligence by teaching him to identify and manage his emotions, understand others' perspectives, and communicate effectively in various social settings."}]}
     
     familyTitle = {
         'family_relationship' : "",
@@ -1598,8 +3291,1275 @@ def generateBabyReport(formatted_date,formatted_time,location,lat,lon,planets,pa
         'physical_activity': "Unique Talents in Physical Activity"
     }
     
-    con = chapterPrompt(planets,0,name,gender)
-    # con = {'education': [{'title': 'Analytical Skills', 'content': 'Magizh has a natural talent for analyzing information and making logical connections. With Mercury positioned in the 3rd house of Sagittarius, in Mula nakshatra, he is likely to have a deep curiosity and a thirst for knowledge. Encourage him to explore various subjects and engage in intellectual pursuits to enhance his analytical abilities.'}, {'title': 'Communication Skills', 'content': 'Due to Mercury in the 3rd house of Sagittarius, Magizh possesses excellent communication skills. He is likely to be articulate, expressive, and persuasive in his speech. Foster his communication skills by encouraging him to participate in debates, public speaking, or writing activities.'}, {'title': 'Adventurous Learning', 'content': 'With Mercury in Sagittarius in Mula nakshatra, Magizh excels in adventurous learning experiences. He may thrive in environments that offer hands-on learning, travel opportunities, and exposure to diverse cultures. Encourage him to pursue academic interests that challenge his intellect and broaden his horizons.'}], 'arts_creative': [{'title': 'Visual Arts', 'content': 'Magizh has a natural talent for visual arts, thanks to Venus positioned in the 1st house of Libra in Vishakha nakshatra. He may excel in painting, drawing, or graphic design. Provide him with opportunities to explore and develop his artistic skills through classes, workshops, or creative projects.'}, {'title': 'Harmonious Expression', 'content': 'With Venus in the 1st house of Libra, Magizh possesses a talent for harmonious expression in his artistic endeavors. He may have a keen sense of aesthetics and a knack for creating beauty. Encourage him to express himself through art, music, or design to tap into his creative potential.'}, {'title': 'Emotional Sensitivity', 'content': 'Venus in Libra in Vishakha nakshatra endows Magizh with emotional sensitivity and empathy. He may excel in artistic fields that require emotional depth and understanding. Nurture his emotional intelligence by encouraging him to explore poetry, music, or theatre to enhance his creative abilities.'}], 'physical_activity': [{'title': 'Endurance and Stamina', 'content': 'Magizh possesses strong physical abilities, particularly in endurance and stamina, with Mars in the 2nd house of Scorpio in Jyeshtha nakshatra. He may excel in activities that require physical strength and perseverance. Support his interest in sports, martial arts, or other physical pursuits to enhance his physical abilities.'}, {'title': 'Competitive Spirit', 'content': 'With Mars in Scorpio in Jyeshtha nakshatra, Magizh has a competitive spirit and enjoys challenges. He may thrive in competitive sports or activities that push his limits. Encourage him to engage in healthy competition to channel his energy effectively and achieve personal growth.'}, {'title': 'Leadership Skills', 'content': 'Mars in Scorpio in Jyeshtha nakshatra indicates that Magizh has strong leadership qualities. He may naturally take charge in group activities and inspire others to follow his lead. Foster his leadership skills by providing opportunities for him to take on roles of responsibility and lead by example.'}]}
+    # con = chapterPrompt(planets,0,name,gender)
+    con = {'education': [{'title': 'Analytical Skills', 'content': 'Magizh has a natural talent for analyzing information and making logical connections. With Mercury positioned in the 3rd house of Sagittarius, in Mula nakshatra, he is likely to have a deep curiosity and a thirst for knowledge. Encourage him to explore various subjects and engage in intellectual pursuits to enhance his analytical abilities.'}, {'title': 'Communication Skills', 'content': 'Due to Mercury in the 3rd house of Sagittarius, Magizh possesses excellent communication skills. He is likely to be articulate, expressive, and persuasive in his speech. Foster his communication skills by encouraging him to participate in debates, public speaking, or writing activities.'}, {'title': 'Adventurous Learning', 'content': 'With Mercury in Sagittarius in Mula nakshatra, Magizh excels in adventurous learning experiences. He may thrive in environments that offer hands-on learning, travel opportunities, and exposure to diverse cultures. Encourage him to pursue academic interests that challenge his intellect and broaden his horizons.'}], 'arts_creative': [{'title': 'Visual Arts', 'content': 'Magizh has a natural talent for visual arts, thanks to Venus positioned in the 1st house of Libra in Vishakha nakshatra. He may excel in painting, drawing, or graphic design. Provide him with opportunities to explore and develop his artistic skills through classes, workshops, or creative projects.'}, {'title': 'Harmonious Expression', 'content': 'With Venus in the 1st house of Libra, Magizh possesses a talent for harmonious expression in his artistic endeavors. He may have a keen sense of aesthetics and a knack for creating beauty. Encourage him to express himself through art, music, or design to tap into his creative potential.'}, {'title': 'Emotional Sensitivity', 'content': 'Venus in Libra in Vishakha nakshatra endows Magizh with emotional sensitivity and empathy. He may excel in artistic fields that require emotional depth and understanding. Nurture his emotional intelligence by encouraging him to explore poetry, music, or theatre to enhance his creative abilities.'}], 'physical_activity': [{'title': 'Endurance and Stamina', 'content': 'Magizh possesses strong physical abilities, particularly in endurance and stamina, with Mars in the 2nd house of Scorpio in Jyeshtha nakshatra. He may excel in activities that require physical strength and perseverance. Support his interest in sports, martial arts, or other physical pursuits to enhance his physical abilities.'}, {'title': 'Competitive Spirit', 'content': 'With Mars in Scorpio in Jyeshtha nakshatra, Magizh has a competitive spirit and enjoys challenges. He may thrive in competitive sports or activities that push his limits. Encourage him to engage in healthy competition to channel his energy effectively and achieve personal growth.'}, {'title': 'Leadership Skills', 'content': 'Mars in Scorpio in Jyeshtha nakshatra indicates that Magizh has strong leadership qualities. He may naturally take charge in group activities and inspire others to follow his lead. Foster his leadership skills by providing opportunities for him to take on roles of responsibility and lead by example.'}]}
+    
+    for index,(k, v) in enumerate(con.items()):
+        if pdf.get_y() + 40 >= 260:  
+            pdf.AddPage(path)
+            pdf.set_y(30)
+        
+        pdf.ContentDesign(random.choice(DesignColors),uniqueTitle[k],v,path,name)
+        
+    pdf.AddPage(path,"Atma Karga & Ishta Devata ")
+    roundedBox(pdf,"#FFD7D7",20,pdf.get_y() + 4,pdf.w - 40,50)
+    pdf.set_font('Karma-Semi', '', 20)
+    pdf.set_text_color(0,0,0)
+    pdf.set_y(pdf.get_y() + 10)
+    pdf.cell(0,0,'AtmaKaraka',align='C')
+    pdf.set_text_color(hex_to_rgb("#940000"))
+    pdf.set_font_size(12)
+    pdf.set_xy(22.5,pdf.get_y() + 4)
+    pdf.multi_cell(pdf.w - 45,8,"Atmakaraka, a Sanskrit term for 'soul indicator' is the planet with the highest degree in your birth chart. It reveals your deepest desires and key strengths and weaknesses. Understanding your Atmakaraka can guide you toward your true purpose and inspire meaningful changes in your life.",align='L')
+    
+    pdf.image(f"{path}/babyImages/atma_{atma['Name']}.jpeg",pdf.w / 2 - 22.5, 95,45,0)
+    roundedBox(pdf,"#FFE7E7",45,182,pdf.w - 90,12)
+    pdf.set_y(182)
+    pdf.set_font('Karma-Semi', '', 20)
+    pdf.cell(0,12,f"{atma['Name']} is your Atmakaraka",align='C')
+    pdf.set_xy(22.5,200)
+    pdf.set_text_color(0,0,0)
+    pdf.set_font('Karma-Regular', '', 18) 
+    pdf.multi_cell(pdf.w - 45,8,f"      {athmakaraka[atma['Name']]}",align='L')
+    
+    pdf.AddPage(path,f"{name}'s Favourable God")
+    roundedBox(pdf,"#D7FFEA",20,pdf.get_y() + 5,pdf.w-40,40)
+    pdf.set_font('Karma-Regular', '', 14) 
+    pdf.set_text_color(hex_to_rgb("#365600"))
+    pdf.set_xy(22.5,pdf.get_y() + 7.5)
+    pdf.multi_cell(pdf.w - 45,8,"       According to the scriptures, worshiping your Ishta Dev gives desired results. Determination of the Ishta Dev or Devi is determined by our past life karmas. There are many methods of determining the deity in astrology. Here, We have used the Jaimini Atmakaraka for Isht Dev decision.",align='L')
+
+    pdf.set_text_color(0,0,0)
+    pdf.image(f"{path}/images/{isthaDeva[0]}.jpeg",pdf.w / 2 - 22.5, pdf.get_y() + 15,45,0)
+    pdf.set_y(pdf.get_y() + 100)
+    pdf.set_font('Karma-Semi', '', 22)
+    pdf.cell(0,0,f"{isthaDeva[0]}",align='C')
+    pdf.set_draw_color(hex_to_rgb("#8A5A19"))
+    pdf.set_xy(22.5,pdf.get_y() + 10)
+    pdf.set_font('Karma-Regular', '', 12) 
+    pdf.multi_cell(pdf.w - 45,8,f"      {ista_devata_desc[isthadevathaLord]}",align='L')
+    
+    planetMain = {
+        "Sun" : "Soul, Vitality, & Leadership Qualities",
+        "Moon" : "Emotions, Intuition, Nurturing  Mind.",
+        "Mars" : "Energy, Courage, Passion, and Assertiveness.",
+        "Mercury" : "Communications, Intelligence, Adaptability.",
+        "Jupiter" : "Wisdom, Expansion, Knowledge, Spirituality.",
+        "Venus" :  "Love, Relationships, Beauty, Art, Comforts.",
+        "Saturn" : "Discipline, Responsibility, Challenges.",
+        "Rahu" :  "Desires, Ambitions, Worldly Attachment." ,
+        "Ketu" : "Spirituality, Detachment, Past Life Influence." 
+    }
+    
+    
+    for index,planet in enumerate(planets):
+        if planet['Name'] == "Ascendant":
+            continue
+        planets_table = table[planet['Name']]
+        
+        if planet['zodiac_lord'] in planets_table[0]:
+            planet['status'] = "Favorable"
+        elif planet['zodiac_lord'] in planets_table[1]:
+            planet['status'] = "Unfavorable"
+        else:
+            planet['status'] = "Neutral"
+            
+        pdf.AddPage(path)
+            
+        pdf.set_text_color(hex_to_rgb("#966A2F"))
+        pdf.set_font('Karma-Heavy', '', 20)
+        pdf.set_xy(20,pdf.get_y() + 5)
+        pdf.multi_cell(pdf.w - 40,10,f"{planet['Name']} - {planetMain[planet['Name']]}",align='C')
+        pdf.image(f"{path}/babyImages/{planet['Name']}.png",40,pdf.get_y() + 10,30,30)
+        y = pdf.get_y() + 10
+        pdf.set_font('Karma-Regular', '', 12) 
+        pdf.set_text_color(0,0,0)
+        content = planetDesc[planet['Name']]
+        if planet['Name'] == "Rahu" or planet['Name'] == "Ketu":
+            roundedBox(pdf,random.choice(DesignColors),85,pdf.get_y() + 5,110, pdf.no_of_lines(content[0],105) * 8 + 5)
+            pdf.set_xy(90,pdf.get_y() + 7.5)
+            pdf.multi_cell(105,8,content[0],align='L')
+        else:
+            roundedBox(pdf,random.choice(DesignColors),85,pdf.get_y() + 10,110, pdf.no_of_lines(content[0],105) * 8 + 5)
+            pdf.set_xy(90,pdf.get_y() + 12.5)
+            pdf.multi_cell(105,8,content[0],align='L')
+        
+        if planet['Name'] == "Ketu":
+            y = y + 10
+        
+        pdf.set_y(y + 40)
+        if planet['Name'] == "Ketu":
+            pdf.set_y(pdf.get_y() - 7.5)
+        color = random.choice(DesignColors)
+        roundedBox(pdf, color ,20,pdf.get_y(),pdf.w-40, 40)
+        pdf.set_y(pdf.get_y() + 7.5)
+        pdf.set_font('Karma-Semi', '' , 16) 
+        pdf.cell(0,0,f"Teach Discipline : {content[1][0]}",align='C')
+        pdf.set_xy(22.5,pdf.get_y() + 5)
+        pdf.set_font('Karma-Regular', '', 14)
+        
+        smallTitle = {
+            1 : f"{planet['Name']} Guide to {name}: ",
+            2 : "",
+            3 : f"Say to {name}: "
+        }
+        
+        for i in range(1,len(content[1])):
+            content[2][i] = content[2][i].replace("child",name).replace("Child",name)
+            if i != len(content[1]) - 1:
+                roundedBox(pdf, color ,20,pdf.get_y(),pdf.w-40, pdf.no_of_lines(f"{smallTitle[i]}{content[1][i]}",pdf.w - 45) * 7 + 7,status=False)
+            else:
+                roundedBox(pdf, color ,20,pdf.get_y(),pdf.w-40 , pdf.no_of_lines(f"{smallTitle[i]}{content[1][i]}",pdf.w - 45) * 7 + 7)
+                roundedBox(pdf, color ,20,pdf.get_y(),pdf.w-40 , 5,status=False)
+            content[1][i] = content[1][i].replace("child",name).replace("Child",name)
+            pdf.multi_cell(pdf.w - 45,7,f"{smallTitle[i]}{content[1][i]}",align='L',new_y=YPos.NEXT, new_x=XPos.LEFT)
+        pdf.set_y(pdf.get_y() + 15)
+        if planet['Name'] == "Ketu":
+            pdf.set_y(pdf.get_y() - 5)
+        color = random.choice(DesignColors)
+        roundedBox(pdf, color ,20,pdf.get_y(),pdf.w-40, 40)
+        pdf.set_font('Karma-Semi', '' , 16) 
+        pdf.set_y(pdf.get_y() + 7.5)
+        pdf.cell(0,0,f"Teach Life Lesson : {content[2][0]}",align='C')
+        pdf.set_xy(22.5,pdf.get_y() + 5)
+        pdf.set_font('Karma-Regular', '', 14)
+        
+        for i in range(1,len(content[2])):
+            content[2][i] = content[2][i].replace("child",name).replace("Child",name)
+            if i != len(content[1]) - 1:
+                roundedBox(pdf, color ,20,pdf.get_y(),pdf.w-40, pdf.no_of_lines(f"{smallTitle[i]}{content[2][i]}",pdf.w - 45) * 7 + 7,status=False)
+            else:
+                roundedBox(pdf,color ,20,pdf.get_y(),pdf.w-40 , pdf.no_of_lines(f"{smallTitle[i]}{content[2][i]}",pdf.w - 45) * 7 + 7)
+                roundedBox(pdf, color ,20,pdf.get_y(),pdf.w-40 , 5,status=False)
+            pdf.multi_cell(pdf.w - 45,7,f"{smallTitle[i]}{content[2][i]}",align='L',new_y=YPos.NEXT, new_x=XPos.LEFT)
+        pdf.set_y(pdf.get_y() + 15)
+        if planet['Name'] == "Ketu":
+            pdf.set_y(pdf.get_y() - 5)
+        color = random.choice(DesignColors)
+        roundedBox(pdf, color ,20,pdf.get_y(),pdf.w-40, 40)
+        pdf.set_font('Karma-Semi', '' , 16) 
+        pdf.set_y(pdf.get_y() + 7.5)
+        pdf.cell(0,0,f"Teach Food & Diet : {content[4][0]}",align='C')
+        pdf.set_xy(22.5,pdf.get_y() + 5)
+        pdf.set_font('Karma-Regular', '', 14)
+        for i in range(1,len(content[4])):
+            content[2][i] = content[2][i].replace("child",name).replace("Child",name)
+            if i != len(content[1]) - 1:
+                roundedBox(pdf, color ,20,pdf.get_y(),pdf.w-40, pdf.no_of_lines(f"{smallTitle[i]}{content[4][i]}",pdf.w - 45) * 7 + 7,status=False)
+            else:
+                roundedBox(pdf, color ,20,pdf.get_y(),pdf.w-40 , pdf.no_of_lines(f"{smallTitle[i]}{content[4][i]}",pdf.w - 45) * 7 + 7)
+                roundedBox(pdf, color ,20,pdf.get_y(),pdf.w-40 , 5,status=False)
+            pdf.multi_cell(pdf.w - 45,7,f"{smallTitle[i]}{content[4][i]}",align='L',new_y=YPos.NEXT, new_x=XPos.LEFT)
+    
+def masterReport(pdf,path,planets,panchang,dasa,birthchart,formatted_date,formatted_time,location,year,month,name,DesignColors):
+    pdf.add_page()
+    pdf.set_font('Karma-Semi', '', 38)
+    pdf.set_text_color(hex_to_rgb("#040606"))
+    pdf.image(f"{path}/babyImages/book-cover3.png", 0 , 0 , pdf.w , pdf.h)
+    pdf.AddPage(path)
+    pdf.set_xy(30,40)
+    pdf.multi_cell(pdf.w - 60, 18, f"{name.split()[0]}'s First Astrology Report", align='C')
+    pdf.set_font_size(22)
+    
+    pdf.image(f'{path}/babyImages/starting.png', pdf.w / 2 - 50, pdf.h / 2 - 50, 100, 100)
+    
+    pdf.set_xy(22.5, 220)
+    pdf.multi_cell(pdf.w - 45, 10, f"           The Precious Child Born on the auspicious day {formatted_date} at {formatted_time}. Place of birth is {location}")
+    
+    pdf.AddPage(path)
+    pdf.set_y(30)
+    pdf.cell(0,10,"Contents",align='C') 
+    pdf.set_y(45)
+    for c in context[3]:
+        if pdf.get_y() + (pdf.get_string_width(c) / (pdf.w - 30))  >= 260:
+            pdf.AddPage(path)
+            pdf.set_y(30)
+            
+        pdf.set_font('Karma-Semi', '', 16)
+        pdf.set_xy(30,pdf.get_y() + 5)
+        pdf.multi_cell(pdf.w - 60,10,f"{context[3].index(c) + 1}. {c}",align='L') 
+    
+    pdf.AddPage(path)
+    pdf.set_xy(50,(pdf.h / 2) - 15)
+    pdf.set_font('Karma-Heavy', '', 36) 
+    pdf.multi_cell(pdf.w - 100,15,f"{name}'s Astrology Details",align='C')
+    pdf.AddPage(path)
+    pdf.set_y(40)
+    pdf.set_font('Karma-Heavy', '', 42) 
+    pdf.set_text_color(hex_to_rgb("#E85D2B"))
+    pdf.cell(0,0,"Horoscope Details",align='C')
+    pdf.set_text_color(0,0,0)
+    
+    pdf.set_font('Karma-Regular', '', 22) 
+    
+    pdf.set_xy(20,60)
+    pdf.set_font_size(16)
+    asc = list(filter(lambda x: x['Name'] == 'Ascendant', planets))[0]
+    ninthHouseLord = zodiac_lord[((zodiac.index(asc['sign']) + 9) % 12) - 1]
+    signLord = list(filter(lambda x: x['Name'] == ninthHouseLord,planets))[0]
+
+    isthadevathaLord = list(filter(lambda x: x['Name'] == signLord['Name'],planets))[0]['nakshatra_lord']
+    
+    isthaDeva = ista_devatas[isthadevathaLord]
+    
+    atma = list(filter(lambda x: x['order'] == 1,planets))[0]
+    if atma['Name'] == "Ascendant":
+        atma = list(filter(lambda x: x['order'] == 2,planets))[0]
+        
+    moon = list(filter(lambda x : x['Name'] == "Moon",planets))[0]
+        
+    nakshatrasOrder = nakshatras[nakshatras.index(moon['nakshatra']):] + zodiac[:nakshatras.index(moon['nakshatra'])]
+    favourableNakshatra = ""
+    for index,nakshatra in enumerate(nakshatrasOrder):
+        if index % 9 == 1:
+            favourableNakshatra += f"{nakshatra}, "
+            
+    luckyNumber = nakshatraNumber[panchang['nakshatra']]
+    
+    fiveHouseLord = zodiac_lord[((zodiac.index(asc['sign']) + 5) % 12) - 1]
+    ninthHouseLord = zodiac_lord[((zodiac.index(asc['sign']) + 9) % 12) - 1]
+    
+    stones = [Planet_Gemstone_Desc[asc['zodiac_lord']],Planet_Gemstone_Desc[fiveHouseLord],Planet_Gemstone_Desc[ninthHouseLord]]
+
+    left_column_text = [
+        'Name :',
+        'Date Of Birth :',
+        'Time Of Birth :',
+        'Place Of Birth :',
+        'Birth Nakshatra, Lord :',
+        'Birth Rasi, Lord :',
+        'Birth Lagnam, Lord :',
+        'Tithi :',
+        'Nithya Yogam :',
+        'Karanam :',
+        'Birth Week Day :',
+        'Atma Karagam, Lord : ',
+        'Ishta Devata :',
+        'Benefic Stars :',
+        'Benefic Number :',
+        'Life Stone :',
+        'Benefictical Stone :',
+        'Lucky Stone :'
+    ]
+
+    right_column_text = [
+        f"{name}",
+        f"{formatted_date}",
+        f"{formatted_time}",
+        f"{location}",
+        f"{panchang['nakshatra']}, {planets[2]['nakshatra_lord']}",
+        f"{planets[2]['sign']}, {planets[2]['zodiac_lord']}",
+        f"{planets[0]['sign']}, {planets[0]['zodiac_lord']}",
+        f"{panchang['thithi']}",
+        f"{panchang['yoga']}",
+        f"{panchang['karanam']}",
+        f"{panchang['week_day']}",
+        f"{atma['Name']},{atma_names[atma['Name']]}",
+        f"{isthaDeva[0]}",
+        f"{favourableNakshatra}",
+        f"{luckyNumber[0]},{luckyNumber[1]}",
+        f"{stones[0]['Gemstone']}",
+        f"{stones[1]['Gemstone']}",
+        f"{stones[2]['Gemstone']}"
+    ]
+
+    x_start = 30
+    y_start = pdf.get_y() + 10
+    pdf.set_xy(x_start, y_start)
+
+    for index,row in enumerate(left_column_text):
+        pdf.set_font('Karma-Semi', '', 14)
+        pdf.cell(65, 10, row, new_x=XPos.RIGHT, new_y=YPos.TOP,align='R')
+        y_start = pdf.get_y()
+        pdf.set_font('Karma-Regular', '', 14)
+        pdf.multi_cell(100, 10, right_column_text[index],align='L')
+        y_start = pdf.get_y()
+        pdf.set_xy(x_start, y_start)
+    
+    name = name.split(" ")[0]
+    
+    pdf.AddPage(path)
+    pdf.set_font('Karma-Heavy', '', 26)  
+    pdf.set_y(30)
+    pdf.cell(0,0,'Birth Chart',align='C')
+    pdf.image(f"{path}/chart/{birthchart['birth_chart']}",(pdf.w / 2) - 45,pdf.get_y() + 10,90,90)
+    pdf.set_y(145)
+    pdf.cell(0,0,'Navamsa Chart',align='C')
+    pdf.image(f"{path}/chart/{birthchart['navamsa_chart']}",(pdf.w / 2) - 45,pdf.get_y() + 10,90,90)
+    pdf.set_y(pdf.get_y() + 110)
+
+    pdf.set_font('Karma-Regular', '', 18) 
+    for b in dasa[planets[1]['nakshatra_lord']]:
+        if (b['start_year'] <= year <= b['end_year']):
+            if not (year == b['end_year'] and b['end_month'] >= month):
+                pdf.cell(0,0,f"Dasa : {planets[2]['nakshatra_lord']} Bhukthi : {b['bhukthi']}",align='C')
+                break
+            
+    pdf.AddPage(path)
+    pdf.set_y(30)
+    pdf.set_font('Karma-Heavy', '', 32)  
+    pdf.cell(0,0,'Planetary Positions',align='C')
+    pdf.set_fill_color(200, 220, 255)  
+    pdf.set_font('Karma-Regular', '', 12)
+        
+    start_x = 5
+    start_y = 50
+    spacing_x = 80  
+    spacing_y = 80 
+    
+    colors = ["#FFFDAC","#EAECE8","#FFAF7B","#C6B9A9","#FFE8B2","#FDD29D","#C3B3AA","#A4EDFF","#C5FFB5","#FFF6F6"]
+    
+    for i, planet in enumerate(planets):
+        if i == 6:
+            pdf.AddPage(path)
+            x = start_x + 30
+            y = 30
+        elif i == 7:
+            x = start_x + spacing_x + 30
+            y = 30
+        elif i == 8:
+            x = start_x + 30
+            y = start_y + spacing_y - 20
+        elif i == 9:
+            x = start_x + spacing_x + 30
+            y = start_y + spacing_y - 20
+        else:
+            x = start_x + (i % 2) * spacing_x + 30  
+            y = start_y + (i // 2) * spacing_y 
+        
+        pdf.table(planet, x, y,path,colors[i])
+        
+    pdf.AddPage(path)
+    pdf.set_font('Karma-Heavy', '', 22)
+    pdf.set_y(20)
+    pdf.cell(0,0,f"{name}'s Favorable Times",align='C') 
+    
+    i = 0
+    
+    for d,b in dasa.items():
+        if i == 0:
+            x = 20
+            y = 20
+        if i == 1:
+            x = 80
+            y = 20
+        if i == 2:
+            x = 140
+            y = 20
+            
+        if i == 3:
+            x = 20
+            y = 145
+            
+        if i == 4:
+            x = 80
+            y = 145
+            
+        if i == 5:
+            x = 140
+            y = 145
+            
+        if i == 6:
+            pdf.AddPage(path)
+            x = 20
+            y = 15
+        
+        if i == 7:
+            x = 80
+            y = 15
+        
+        if i == 8:
+            x = 140
+            y = 15
+        
+        if i == 0:
+            start_age = 0
+            end_age =  int(b[-1]['end_year']) - year
+        else:
+            start_age =  int(b[0]['end_year']) - year
+            end_age =  int(b[-1]['end_year']) - year 
+        i = i + 1
+        pdf.setDasa(d,b,x,y,start_age,end_age,path)
+        
+    data = {
+        "Favourable": "#DAFFDC",
+        "Unfavourable": "#FFDADA",
+        "Moderate": "#DAE7FF"
+    }
+        
+    pdf.set_font('Karma-Heavy', '', 22)
+    pdf.set_xy(22.5,pdf.get_y() + 20)
+    pdf.cell(pdf.w - 45,0,f"Note:",align='L')
+    for i,(label,value) in enumerate(data.items()):
+        pdf.set_y(pdf.get_y() + 20)
+        pdf.set_fill_color(*hex_to_rgb(value))
+        pdf.rect(40,pdf.get_y() - 6,8,8,round_corners=True,corner_radius=5,style='F')
+        pdf.set_font('Karma-Semi', '', 16)
+        pdf.set_text_color(0,0,0)
+        pdf.text(55,pdf.get_y(),f'{label}')
+        
+    pdf.AddPage(path)
+    pdf.set_xy(20,20)
+    pdf.set_font('Karma-Heavy', '' , 26)
+    pdf.set_text_color(hex_to_rgb("#966A2F"))
+    pdf.multi_cell(pdf.w - 40 , 10, f"{name}'s Five Natural Elements", align='C')
+    elements = {
+        "Fire": 0,
+        "Earth": 0,
+        "Air": 0,
+        "Water" : 0 
+    }
+    
+    for pla in planets:
+        for d,k in elements.items():
+            if pla['Name'] == "Ascendant" or pla['Name'] == "Rahu" or pla['Name'] == "Ketu":
+                continue
+            if pla['sign'] in elements_data[d]:
+                elements[d] = elements[d] + 1 
+    for d,k in elements.items():
+        elements[d] = (elements[d] / 7) * 100
+                
+    max_key1 = max(elements, key=elements.get)
+    
+    max_value2 = 0
+    max_key2 = ""
+    
+    for k,v in elements.items():
+        if k == max_key1:
+            continue
+        
+        if v > max_value2:
+            max_value2 = v
+            max_key2 = k
+    
+    dominantElementData = elements_content[max_key1]
+    
+    pdf.set_text_color(hex_to_rgb("#04650D"))
+    pdf.set_fill_color(hex_to_rgb("#BAF596"))
+    pdf.set_draw_color(hex_to_rgb("#06FF4C"))
+    pdf.rect(22.5,pdf.get_y() + 5,pdf.w - 45,15,round_corners=True,corner_radius=5,style='DF')
+    pdf.set_y(pdf.get_y() + 5)
+    pdf.set_font_size(14)
+    pdf.cell(0,15,f"{name}'s Dominant Element are {max_key1} and {max_key2}",align='C') 
+    
+    pdf.set_font('Karma-Regular', '', 16) 
+    roundedBox(pdf,"#FFF2D7",20,pdf.get_y() + 20, pdf.w - 40,pdf.no_of_lines(dominantElementData[0],pdf.w - 45) * 8 + 5)
+    pdf.set_xy(23.5,pdf.get_y() + 22.5)
+    pdf.set_text_color(0,0,0)
+    pdf.multi_cell(pdf.w - 45,8,dominantElementData[0],align='L')
+        
+    colors = [
+        "#FF0000",
+        "#43A458",
+        "#B1DC36",
+        "#4399FF"
+    ]
+
+    x_start = 20
+    y_base = pdf.get_y() + 75
+    bar_width = 20
+    bar_spacing = 10
+    max_height = 50
+
+    pdf.draw_bar_chart(x_start, y_base, bar_width, bar_spacing, elements, colors, max_height, path)
+    
+    y = pdf.get_y() - 45
+    for i,(label,value) in enumerate(elements.items()):
+        pdf.set_font('Karma-Semi', '', 18)
+        pdf.set_text_color(*hex_to_rgb(colors[i]))
+        pdf.text(150,y,f'{label}: {value:.2f}%')
+        y += 15
+    
+    pdf.set_text_color(0,0,0)
+    pdf.set_y(pdf.get_y() + 15)
+    
+    pdf.cell(0,0,"Impacts on Personality",align='C')
+    pdf.set_font("Times", '', 14)
+    pdf.set_xy(22.5,pdf.get_y() + 5)
+    pdf.multi_cell(pdf.w - 45, 8, f"**Strength** : {dominantElementData[1][0]}, {dominantElementData[1][1]}, {dominantElementData[1][2]}, {dominantElementData[1][3]}",align='L',markdown=True)
+    pdf.set_xy(22.5,pdf.get_y())
+    pdf.set_font("Times", '', 14)
+    pdf.multi_cell(pdf.w - 45, 8, f"**Challenges** : {dominantElementData[2][0]}, {dominantElementData[2][1]}, {dominantElementData[2][2]}, {dominantElementData[2][3]}",align='L',markdown=True)
+    
+    pdf.set_y(pdf.get_y() + 10)
+    pdf.set_font('Karma-Semi', '', 16)
+    pdf.cell(0,0,f"Parenting Tips to Balance {max_key1} Element", align='C')	
+    pdf.set_xy(22.5,pdf.get_y() + 10)
+    pdf.set_font("Times", '', 14)
+    pdf.multi_cell(pdf.w - 45, 8, f"    **{dominantElementData[3]['title']}** : {dominantElementData[3]['desc']}",align='L',markdown=True)
+    
+    pdf.AddPage(path)
+    pdf.set_xy(20,20)
+    pdf.set_font('Karma-Heavy', '' , 26)
+    pdf.set_text_color(hex_to_rgb("#966A2F"))
+    pdf.multi_cell(pdf.w - 40 , 10, f"{name}'s  Ayurvedic Body Type", align='C')
+    pdf.set_text_color(hex_to_rgb("#04650D"))
+    pdf.set_fill_color(hex_to_rgb("#BAF596"))
+    pdf.set_draw_color(hex_to_rgb("#06FF4C"))
+    pdf.rect(22.5,pdf.get_y() + 5,pdf.w - 45,15,round_corners=True,corner_radius=5,style='DF')
+    pdf.set_y(pdf.get_y() + 5)
+    pdf.set_font_size(14)
+    lagna = list(filter(lambda x : x['Name'] == "Ascendant",planets))[0]
+    data = {
+        "Pitta": (int(constitutionRatio[moon['zodiac_lord']]['Pitta']) + int(constitutionRatio[lagna['zodiac_lord']]['Pitta'])) / 200 * 100,
+        "Kapha": (int(constitutionRatio[moon['zodiac_lord']]['Kapha']) + int(constitutionRatio[lagna['zodiac_lord']]['Kapha'])) / 200 * 100,
+        "Vadha": (int(constitutionRatio[moon['zodiac_lord']]['Vata']) + int(constitutionRatio[lagna['zodiac_lord']]['Vata'])) / 200 * 100,
+    }
+    
+    maxValue = max(data, key=data.get)
+    constitutionMax = Constitution[maxValue]
+    pdf.cell(0,15,f"{name}'s Body is Dominated by {maxValue} Nature",align='C') 
+    
+    
+    pdf.set_font('Karma-Regular', '', 14) 
+    roundedBox(pdf,"#D7ECFF",20,pdf.get_y() + 20,pdf.w - 40,pdf.no_of_lines(constitutionMax[0],pdf.w - 45) * 8 + 5)
+    pdf.set_xy(22.5,pdf.get_y() + 22.5)
+    pdf.set_text_color(0,0,0)
+    pdf.multi_cell(pdf.w - 45,8,f"{constitutionMax[0]}",align='L')
+    
+    colors = [
+        "#E34B4B",   
+        "#43C316",   
+        "#4BDAE3"    
+    ]
+
+    x_start = 30
+    y_base = pdf.get_y() + 60
+    bar_width = 20
+    bar_spacing = 20
+    max_height = 40
+
+    pdf.draw_bar_chart(x_start, y_base, bar_width, bar_spacing, data, colors, max_height,path)
+    pdf.set_y(pdf.get_y() - 35)
+    for i,(label,value) in enumerate(data.items()):
+        pdf.set_font('Karma-Semi', '', 18)
+        pdf.set_text_color(*hex_to_rgb(colors[i]))
+        pdf.text(150,pdf.get_y(),f'{label}: {value:.2f}%')
+        pdf.set_y(pdf.get_y() + 15)
+        
+    pdf.set_text_color(0,0,0)
+    pdf.set_y(pdf.get_y() + 10)
+    pdf.set_font('Karma-Semi', '', 16)
+    pdf.cell(0,0,"Impacts on Body Type, Emotions, and Health",align='C')
+    
+    pdf.set_font("Times", '', 14)
+    pdf.set_xy(22.5,pdf.get_y() + 5)
+    pdf.multi_cell(pdf.w - 45, 8, f"**Body Type** : {constitutionMax[1]}",align='L',markdown=True)
+    pdf.set_xy(22.5,pdf.get_y())
+    pdf.set_font("Times", '', 14)
+    pdf.multi_cell(pdf.w - 45, 8, f"**Emotions** : {constitutionMax[2]}",align='L',markdown=True)
+    pdf.set_xy(22.5,pdf.get_y())
+    pdf.set_font("Times", '', 14)
+    pdf.multi_cell(pdf.w - 45, 8, f"**Health** : {constitutionMax[3]}",align='L',markdown=True)
+    
+    pdf.set_y(pdf.get_y() + 10)
+    pdf.set_font('Karma-Semi', '', 16)
+    pdf.cell(0,0,f"Parenting Tips to Balance {max_key1} Dosha", align='C')	
+    pdf.set_xy(22.5,pdf.get_y() + 10)
+    pdf.set_font("Times", '', 14)
+    pdf.multi_cell(pdf.w - 45, 8, f"    **{constitutionMax[4]['title']}** : {constitutionMax[4]['desc']}",align='L',markdown=True)
+    
+    
+    DesignColors = ["#BDE0FE", "#FEFAE0", "#FFC8DD", "#CAF0F8", "#FBE0CE", "#C2BCFF", "#9DE3DB", "#EDBBA3", "#EDF2F4", "#FFD6A5" , "#CBF3DB", "#94D8FD", "#DEE2FF", "#FEEAFA", "#D7AEFF", "#EEE4E1"]
+    
+    chakrasOrder = ["Root Chakra","Sacral Chakra","Solar Plexus Chakra","Heart Chakra","Throat Chakra","Third Eye Chakra","Crown Chakra"]
+    
+    pdf.AddPage(path,f"{name}'s Chakras")
+    pdf.set_text_color(0,0,0)
+    pdf.set_font_size(18)
+    childChakras = chakras[planets[0]['sign']][0]
+    chakrasContent = chakra_desc[childChakras]
+    pdf.set_xy(20,pdf.get_y() + 10)
+    pdf.multi_cell(pdf.w - 40,8,f"{name}'s Dominant Chakra is {childChakras}",align='C')
+    pdf.set_font('Karma-Regular', '', 14)
+    pdf.set_xy(20,pdf.get_y() + 10)
+    pdf.multi_cell(pdf.w - 40,8,f"      {chakrasContent[0]}",align='L')
+    pdf.set_font("Karma-Heavy", '', 16)
+    pdf.set_xy(22.5, pdf.get_y() + 5)
+    pdf.multi_cell(pdf.w - 45,8, chakrasContent[1],align='C')
+    if chakrasOrder.index(childChakras) in [5,6]:
+        pdf.image(f"{path}/babyImages/chakra_{chakrasOrder.index(childChakras) + 1}.png",pdf.w / 2 - 20,pdf.get_y() + 5 ,40,0)
+    else:
+        pdf.image(f"{path}/babyImages/chakra_{chakrasOrder.index(childChakras) + 1}.png",pdf.w / 2 - 15,pdf.get_y() + 10 ,30,0)
+    pdf.set_y(pdf.get_y() + 55)
+    pdf.set_font('Karma-Heavy', '', 22)
+    pdf.cell(0,0,f"{childChakras}",align='C')
+    pdf.set_xy(22.5,pdf.get_y() + 10)   
+    pdf.set_font('Karma-Semi', '', 16)
+    pdf.multi_cell(pdf.w - 45,8,f"Parenting Tips to Increase {name}'s Aura and Energy Level",align='C')
+    pdf.set_xy(22.5, pdf.get_y() + 10)
+    pdf.set_font('Times', '' , 14)
+    pdf.multi_cell(pdf.w - 45,8,f"          **{chakrasContent[2]['title']}** : {chakrasContent[2]['desc']}",align='L',markdown=True)
+
+    pdf.AddPage(path,f"{name}'s True Self")
+    pdf.set_xy(20,pdf.get_y() + 10)
+    pdf.set_text_color(0,0,0)
+    pdf.set_font_size(18)
+    pdf.multi_cell(pdf.w - 40,8,f"Let's take a look at the three most influential and important sign for {name}!",align='C')
+    pdf.set_font('Karma-Semi', '', 18)
+    pdf.set_xy(30,pdf.get_y() + 10)
+    pdf.cell(0,0,f"As per {name}'s kundli,")
+    y = pdf.get_y() + 10
+    roundedBoxBorder(pdf,"#FFE769","#C5A200",20,y,planets[1]['Name'],planets[1]['sign'],path)
+    roundedBoxBorder(pdf,"#D1C4E9","#A394C6",80,y,planets[0]['Name'],planets[0]['sign'],path)
+    roundedBoxBorder(pdf,"#B3E5FC","#82B3C9",140,y,planets[2]['Name'],planets[2]['sign'],path)
+    pdf.set_y(pdf.get_y() + 10)
+    
+    content = {'child_personality': lagnaIdentity[planets[0]['sign']].replace("child",name).replace("Child",name), 'emotional_needs': moonIdentity[planets[2]['sign']].replace("child",name).replace("Child",name), 'core_identity': sunIdentity[planets[1]['sign']].replace("child",name).replace("Child",name)}
+    
+    trueTitle = {
+        "child_personality" : f"{name}'s Personality",
+        "emotional_needs" : f"{name}'s Emotions",
+        "core_identity" : f"{name}'s Core Identity"
+    }
+    
+    for index , (k, v) in enumerate(content.items()):
+        if pdf.get_y() + 30 >= 260:  
+            pdf.AddPage(path)
+            pdf.set_y(20)
+            
+        pdf.ContentDesign(random.choice(DesignColors),trueTitle[k],v,path,name)
+    
+        
+    pdf.AddPage(path,f"Panchangam: A Guide to {name}'s Flourishing Future")
+    pdf.set_font('Karma-Regular', '' , 14)
+    pdf.set_text_color(0,0,0)
+    pdf.set_xy(22.5,pdf.get_y() + 5)
+    pdf.multi_cell(pdf.w - 45, 8 , "Activating the Panchangam elements (Thithi, Vaaram, Nakshatra, Yogam, Karanam) can potentially bring balance to child's life, fostering positive energies and promoting growth.", align='L')
+    pdf.set_y(pdf.get_y() + 5)
+    pdf.lineBreak(f"{name} was born on {formatted_date}, {panchang['week_day']} (Vaaram), under {panchang['nakshatra']} Nakshatra, {panchang['paksha']} Paksha {panchang['thithi']} Thithi, {panchang['karanam']} Karanam, and {panchang['yoga']} Yogam",path, "#BAF596")
+    
+    colors = ["#E5FFB5","#94FFD2","#B2E4FF","#D6C8FF","#FFDECA"]    
+    titles = [f"Tithi Represents {name}'s Emotions, Mental Well-being",f"Vaaram Represents {name}'s Energy & Behaviour",f"Nakshatra Represents {name}'s Personality and Life Path",f"Yogam Represents {name}'s Prosperity and Life Transformation",f"Karanam Represents {name}'s Work and Actions"]
+    
+    titleImage = ['waningMoon.png' if panchang['thithi_number'] <= 15 else 'waxingMoon.png','week.png','nakshatra.png','yogam.png','karanam.png']
+    
+    panchangContent = [
+        "",
+        "",
+        "Magizh, born under the Bharani Nakshatra, possesses a dynamic and determined personality. He is known for his strong willpower, ambitious nature, and unwavering focus on achieving his goals. Magizh is often seen as a natural leader, with a charismatic presence that draws others towards him. His life path is marked by transformation and growth, as he navigates challenges with resilience and adaptability. Overall, Magizh's Bharani Nakshatra characteristics make him a force to be reckoned with, capable of achieving great success and making a lasting impact in the world.",
+        "Magizh, born under the Shiva Yogam, possesses a deep connection to spirituality and a strong sense of inner peace and tranquility. His goals revolve around achieving spiritual growth, enlightenment, and self-realization. With a profound understanding of the interconnectedness of all things, Magizh strives to spread positivity and uplift others around him, leaving a lasting impact of harmony and balance wherever he goes.",
+        ""
+    ]
+    
+    pdf.set_text_color(0,0,0)
+    pdf.set_y(pdf.get_y() + 5)
+    for i in range(0,5):
+        if pdf.get_y() + 50 >= 260:
+            pdf.AddPage(path)
+            pdf.set_y(30)
+        pdf.image(f"{path}/babyImages/{titleImage[i]}",pdf.w / 2 - 10,pdf.get_y() + 5,20,20) 
+        pdf.set_y(pdf.get_y() + 25)
+        
+        if i == 0:
+            positive = thithiContent[panchang['thithi']][0]
+            negative = thithiContent[panchang['thithi']][1]
+            tips = thithiContent[panchang['thithi']][2]
+            
+    
+            pdf.set_xy(22.5,pdf.get_y() + 5)
+            pdf.set_font('Karma-Semi', '', 18)
+            pdf.multi_cell(pdf.w - 45, 8,titles[i], align='C')
+            pdf.set_xy(22.5,pdf.get_y() + 5)
+            pdf.set_font('Karma-Regular', '', 14)
+            pdf.multi_cell(pdf.w - 45,7,f"{name} was born under {panchang['paksha']} {panchang['thithi']}, and the following are Thithi impacts on {name}'s Life ",align='C')
+            y = pdf.get_y() + 5
+            pdf.set_xy(20,y)
+            pdf.set_fill_color(hex_to_rgb("#DAFFDC"))
+            pdf.set_font('Karma-Semi', '', 16)
+            
+            pdf.checkNewPage(path)
+            data = [
+                (f"Strength",f"Challenges"),
+                (positive[0],negative[0]),
+                (positive[1],negative[1]),
+                (positive[2],negative[2])
+            ]
+            
+            pdf.panchangTable(data)
+                
+            if pdf.get_y() + 20 > 270:
+                pdf.AddPage(path)
+                pdf.set_y(20)
+            pdf.set_xy(30,pdf.get_y() + 10)
+            pdf.set_fill_color(hex_to_rgb(random.choice(DesignColors)))
+            pdf.set_font("Times", '', 14)
+            pdf.cell(pdf.w - 60,10,f"Thithi Lord: **{thithiLord[panchang['thithi']]}**",align='C',fill=True,new_y=YPos.NEXT,markdown=True)
+                
+            pdf.set_font("Times", '', 14)
+            pdf.set_xy(22.5,pdf.get_y() + 5)
+            pdf.multi_cell(pdf.w - 45,7,f"**Parenting Tips** : {tips['Name']} {tips['Description']} {tips['Execution']}",align='L',markdown=True)
+            pdf.set_y(pdf.get_y() + 10)
+            
+        elif i == 1:
+            positive = weekPlanetContent[panchang['week_day']][0]
+            negative = weekPlanetContent[panchang['week_day']][1]
+            tips = weekPlanetContent[panchang['week_day']][2]
+            pdf.checkNewPage(path)
+            
+            pdf.set_xy(22.5,pdf.get_y() + 5)
+            pdf.set_font('Karma-Semi', '', 18)
+            pdf.multi_cell(pdf.w - 45, 8,titles[i], align='C')
+            pdf.set_xy(22.5,pdf.get_y() + 5)
+            pdf.set_font('Karma-Regular', '', 14)
+            pdf.multi_cell(pdf.w - 45,7,f"{name} was born on {panchang['week_day']}, and the following are its impacts on {name}'s life:",align='C')
+            pdf.checkNewPage(path)
+            
+            pdf.checkNewPage(path)
+            data = [
+                (f"Strength",f"Challenges"),
+                (positive[0],negative[0]),
+                (positive[1],negative[1]),
+                (positive[2],negative[2])
+            ]
+            
+            pdf.panchangTable(data)         
+                
+            pdf.checkNewPage(path)
+            pdf.set_font("Times", '', 14)
+            roundedBox(pdf,random.choice(DesignColors),40,pdf.get_y() + 5,pdf.w - 80,10)
+            pdf.set_xy(30,pdf.get_y() + 5)
+            pdf.cell(pdf.w - 60,10,f"Rulling Planet: **{weekPlanet[panchang['week_day']]}**",align='C',new_y=YPos.NEXT,markdown=True)
+            
+            pdf.set_xy(22.5,pdf.get_y() + 5)
+            pdf.multi_cell(pdf.w - 45,7,f"**Parenting Tips** : {tips['Tip']} {tips['Execution']}",align='L',markdown=True)
+            pdf.set_y(pdf.get_y() + 10)
+            
+        elif i == 4:
+            positive = karanamContent[panchang['karanam']][0]
+            negative = karanamContent[panchang['karanam']][1]
+            tips = karanamContent[panchang['karanam']][2]
+            
+            pdf.checkNewPage(path)
+            
+            pdf.set_xy(22.5,pdf.get_y() + 5)
+            pdf.set_font('Karma-Semi', '', 18)
+            pdf.multi_cell(pdf.w - 45, 8,titles[i], align='C')
+            pdf.set_xy(22.5,pdf.get_y() + 5)
+            pdf.set_font('Karma-Regular', '', 14)
+            pdf.multi_cell(pdf.w - 45,7,f"{name} was born under {panchang['karanam']}, and the following are Karanm impacts on {name}'s life:",align='C')
+            pdf.checkNewPage(path)
+            
+            data = [
+                (f"Strength",f"Challenges"),
+                (positive[0],negative[0]),
+                (positive[1],negative[1]),
+                (positive[2],negative[2])
+            ]
+            
+            pdf.panchangTable(data)            
+            pdf.checkNewPage(path)
+            pdf.set_font("Times", '', 14)
+            pdf.set_xy(22.5,pdf.get_y() + 5)
+            pdf.multi_cell(pdf.w - 45,7,f"**Parenting Tips** : {tips['Tip']} {tips['Execution']}",align='L',markdown=True)
+            pdf.set_y(pdf.get_y() + 10)
+        else:
+            # con = panchangPrompt(panchang,i,name,gender)
+            con = panchangContent[i]
+            pdf.ContentDesign(random.choice(DesignColors),titles[i],con,path,name)   
+            
+    sifted = zodiac[zodiac.index(asc['sign']):] + zodiac[:zodiac.index(asc['sign'])]
+    pdf.AddPage(path,"Potential Health Challenges and Holistic Wellness Solutions")
+    sixth_house = sifted[5]
+    con = healthContent[sixth_house]
+    insights = healthInsights[sixth_house].replace("child",name)
+    pdf.set_y(pdf.get_y() + 5)
+    pdf.set_font('Karma-Regular', '', 14)
+    pdf.set_text_color(0,0,0) 
+    pdf.roundedContent(insights,random.choice(DesignColors))
+    color = random.choice(DesignColors)
+    color2 = random.choice(DesignColors)
+    col_width = pdf.w / 2 - 10 - 2.5
+    
+    pdf.set_xy(20, pdf.get_y() + 12.5)
+    pdf.set_font('Karma-Semi', '' , 18)
+    pdf.cell(0,0,"Health Issues Based on", align='C')
+    x = 10 + col_width
+    y = pdf.get_y()
+    roundedBox(pdf, color, 10 , pdf.get_y() + 5, col_width, 40)
+    roundedBox(pdf, color2 , x + 5 , pdf.get_y() + 5, col_width, 40)
+    pdf.set_xy(12.5,pdf.get_y() + 7.5)
+    pdf.set_font('Karma-Semi', '' , 15)
+    pdf.cell(col_width - 5,8, f"Common Health Issues",align='C')
+    pdf.set_xy(12.5, pdf.get_y() + 8)
+    pdf.set_font("Times", '' , 14)
+    for index,c in enumerate(con[0]):
+        text = str(c).split(" (")   
+        if index < len(con[0]) - 2:
+            roundedBox(pdf,color,10, pdf.get_y() + 2.5, col_width, pdf.no_of_lines(f"{index + 1}) {text[0]} ({text[1]}", col_width - 5) * 8 + 8, status=False)
+        elif index == len(con[0]) - 2:
+            roundedBox(pdf,color,10, pdf.get_y() + 2.5, col_width, pdf.no_of_lines(f"{index + 1}) {text[0]} ({text[1]}", col_width - 5) * 8 + 5, status=False)
+        else:
+            roundedBox(pdf,color,10, pdf.get_y() + 2.5, col_width, pdf.no_of_lines(f"{index + 1}) {text[0]} ({text[1]}", col_width - 5) * 8 + 2.5)
+        pdf.multi_cell(col_width - 5, 8 , f"{index + 1}) **{text[0]}** ({text[1]}" , align='L', new_x=XPos.LEFT, new_y=YPos.NEXT,markdown=True)
+    max_y1 = pdf.get_y()
+    pdf.set_xy(x + 7.5,y + 7.5)
+    pdf.set_font('Karma-Semi', '' , 15)
+    pdf.cell(col_width - 5,8, f"Dosha Constitution Issues",align='C')
+    pdf.set_xy(x + 7.5, pdf.get_y() + 8)
+    pdf.set_font("Times", '' , 14)
+    for index,c in enumerate(con[1]):
+        text = str(c).split(" (")   
+        if index != len(con[1]) - 1:
+            roundedBox(pdf,color2,x + 5, pdf.get_y() + 2.5, col_width, pdf.no_of_lines(f"{index + 1}) {text[0]} ({text[1]}", col_width - 5) * 8 + 8, status=False)
+        else:
+            roundedBox(pdf,color2,x + 5, pdf.get_y() + 5, col_width, pdf.no_of_lines(f"{index + 1}) {text[0]} ({text[1]}", col_width - 5) * 8 + 2.5)
+            roundedBox(pdf,color2,x + 5, pdf.get_y() + 2.5, col_width, 8, status=False)
+                
+        pdf.multi_cell(col_width - 5, 8 , f"{index + 1}) **{text[0]}** ({text[1]}" , align='L', new_x=XPos.LEFT, new_y=YPos.NEXT,markdown=True)
+    max_y2 = pdf.get_y()
+    
+    pdf.set_y(max(max_y1,max_y2))    
+    pdf.checkNewPage(path)
+    content = con[3]['natural']
+    pdf.set_y(pdf.get_y() + 20)
+    pdf.set_font('Karma-Heavy', '' , 18)
+    pdf.cell(0,0, f"Remedial Practices",align='C')
+    pdf.set_font_size(16)
+    title = [
+        "Natural Ayurvedic Remedy",
+        "Mudra Practice Remedy",
+        "Mindful Food & Diet Remedy"
+    ]
+    pdf.set_y(pdf.get_y() + 5)
+    colors = ["#CBF3DB","#FFD6A5", "#DEE2FF"]
+    for i,t in enumerate(title): 
+        pdf.set_xy(30,pdf.get_y())
+        roundedBox(pdf,colors[i], pdf.w / 2 - 50, pdf.get_y(), 100, 10, corner=20)
+        pdf.cell(pdf.w - 60,10,t,align='C')
+        pdf.set_y(pdf.get_y() + 15)
+    
+    pdf.AddPage(path)
+    pdf.set_y(20)
+    color = colors[0]
+    roundedBox(pdf, color, 20, pdf.get_y() + 7.5, pdf.w - 40, 50)
+    pdf.image(f"{path}/babyImages/ayur.png",pdf.w / 2 - 10,pdf.get_y() + 7.5,20,20)
+    pdf.set_y(pdf.get_y() + 32.5)
+    pdf.cell(0,0,"Natural Ayurvedic", align='C')
+    pdf.set_font('Karma-Regular', '' , 14) 
+    roundedBox(pdf, color, 20, pdf.get_y() + 5, pdf.w - 40, 20)
+    pdf.set_xy(22.5, pdf.get_y() + 5)
+    pdf.multi_cell(pdf.w - 45, 8 , content[0], align='C')
+    pdf.set_font('Times', '' , 14)
+    roundedBox(pdf, color, 20, pdf.get_y() + 5, pdf.w - 40, pdf.no_of_lines(f"Ingredients: {content[1]}", pdf.w - 45)* 8 + 8)
+    pdf.set_xy(22.5, pdf.get_y() + 5)
+    pdf.multi_cell(pdf.w - 45, 8 , f"**Ingredients:** {content[1]}",markdown=True)
+    roundedBox(pdf, color, 20, pdf.get_y(), pdf.w - 40, pdf.no_of_lines(f"How to Make: {content[2]}", pdf.w - 45)* 8 + 8,status=False)
+    pdf.set_xy(22.5, pdf.get_y())
+    pdf.multi_cell(pdf.w - 45, 8 , f"**How to Make:** {content[2]}",markdown=True)
+    roundedBox(pdf, color, 20, pdf.get_y(), pdf.w - 40, pdf.no_of_lines(f"Benefits: {content[3]}", pdf.w - 45)* 8 + 5)
+    roundedBox(pdf, color, 20 , pdf.get_y(), pdf.w - 40, 5, status=False)
+    pdf.set_xy(22.5, pdf.get_y())
+    pdf.multi_cell(pdf.w - 45, 8 , f"**Benefits:** {content[3]}",markdown=True)
+    
+    content = con[3]['mudra']
+    color = colors[1]
+    pdf.set_font('Karma-Semi', '' , 16)
+    pdf.set_xy(22.5,pdf.get_y() + 20)
+    roundedBox(pdf, color, 20, pdf.get_y(), pdf.w - 40, 60)
+    pdf.image(f"{path}/babyImages/mudra.png",pdf.w / 2 - 10,pdf.get_y() + 7.5,20,20)
+    pdf.set_y(pdf.get_y() + 35)
+    pdf.cell(0,0,"Mudra Practice Remedy", align='C')
+    pdf.set_font('Karma-Regular', '' , 14) 
+    pdf.set_xy(22.5, pdf.get_y() + 5)
+    pdf.multi_cell(pdf.w - 45, 8 , content[0], align='C')
+    roundedBox(pdf, color, 20, pdf.get_y(), pdf.w - 40, 20,status=False)
+    pdf.set_font('Karma-Semi', '' , 16)
+    pdf.set_xy(22.5,pdf.get_y() + 5)
+    pdf.cell(0,0,"Steps",align='L')
+    pdf.set_y(pdf.get_y() + 5)
+    pdf.set_font('Karma-Regular', '' , 14)
+    for i,n in enumerate(content[1]):
+        if pdf.get_y() + pdf.no_of_lines(f"{index}) {n}", pdf.w - 60) * 8 > 270:
+            pdf.AddPage(path)
+            pdf.set_y(20) 
+        roundedBox(pdf, color, 20, pdf.get_y() + 5, pdf.w - 40, pdf.no_of_lines(f"{i + 1}) {n}",pdf.w - 60) * 8 + 8,status=False)
+        pdf.set_xy(30, pdf.get_y() + 2.5)
+        pdf.multi_cell(pdf.w - 60, 8 , f"{i + 1}) {n}" , align='L')
+    pdf.set_font('Times', '' , 14)
+    roundedBox(pdf,color,20,pdf.get_y() + 5, pdf.w - 40, pdf.no_of_lines(f"Benefits: {content[2]}",pdf.w - 45) * 8 + 5)
+    pdf.set_xy(22.5, pdf.get_y() + 5)
+    pdf.multi_cell(pdf.w - 45, 8 , f"**Benefits:** {content[2]}",markdown=True)
+        
+    pdf.AddPage(path)
+    pdf.set_font('Karma-Semi', '' , 16)
+    pdf.set_y(pdf.get_y() + 10)
+    roundedBox(pdf, color, 20, pdf.get_y(), pdf.w - 40, 60)
+    pdf.image(f"{path}/babyImages/food.png",pdf.w / 2 - 10,pdf.get_y() + 2.5,20,20)
+    pdf.set_y(pdf.get_y() + 32.5)
+    pdf.cell(0,0,"Mindful Food & Diet Remedy", align='C')
+    content = healthContent[sixth_house][3]['foods']
+    pdf.set_font('Karma-Heavy', '' , 16) 
+    pdf.image(f"{path}/babyImages/tick.png",22.5,pdf.get_y() + 10,10,10)
+    pdf.set_xy(32.5, pdf.get_y() + 10)
+    pdf.cell(0,10,"Food to Include", align='L')
+    pdf.set_y(pdf.get_y() + 7.5)
+    pdf.set_font('Karma-Regular', '' , 14) 
+    for i,n in enumerate(content[0]):
+        if pdf.get_y() + pdf.no_of_lines(f"{index}) {n}", pdf.w - 60) * 8 > 270:
+            pdf.AddPage(path)
+            pdf.set_y(20) 
+        roundedBox(pdf, color, 20, pdf.get_y() + 2.5, pdf.w - 40, pdf.no_of_lines(f"{i + 1}) {n}",pdf.w - 60) * 8 + 8,status=False)
+        pdf.set_xy(30, pdf.get_y() + 2.5)
+        pdf.multi_cell(pdf.w - 60, 8 , f"{i + 1}) {n}" , align='L')
+    roundedBox(pdf, color, 20, pdf.get_y() + 2.5, pdf.w - 40, 15,status=False)
+    pdf.image(f"{path}/babyImages/cancel.png",22.5,pdf.get_y() + 5,10,10)
+    pdf.set_xy(32.5, pdf.get_y() + 5)
+    pdf.set_font('Karma-Heavy', '' , 16) 
+    pdf.cell(0,10,"Food to Avoid", align='L')
+    pdf.set_y(pdf.get_y() + 7.5)
+    pdf.set_font('Karma-Regular', '' , 14) 
+    for i,n in enumerate(content[1]):
+        if pdf.get_y() + pdf.no_of_lines(f"{index}) {n}", pdf.w - 60) * 8 > 270:
+            pdf.AddPage(path)
+            pdf.set_y(20) 
+        roundedBox(pdf, color, 20, pdf.get_y() + 2.5, pdf.w - 40, pdf.no_of_lines(f"{i + 1}) {n}",pdf.w - 60) * 8 + 8,status=False)
+        pdf.set_xy(30, pdf.get_y() + 2.5)
+        pdf.multi_cell(pdf.w - 60, 8 , f"{i + 1}) {n}" , align='L')
+    roundedBox(pdf, color, 20, pdf.get_y() + 2.5, pdf.w - 40, 15,status=False)
+    pdf.image(f"{path}/babyImages/guide.png",22.5,pdf.get_y() + 5,10,10)
+    pdf.set_xy(32.5, pdf.get_y() + 5)
+    pdf.set_font('Karma-Heavy', '' , 16) 
+    pdf.cell(0,10,"Execution Guide", align='L')
+    pdf.set_y(pdf.get_y() + 7.5)
+    pdf.set_font('Karma-Regular', '' , 14) 
+    for i,n in enumerate(content[2]):
+        if pdf.get_y() + pdf.no_of_lines(f"{index}) {n}", pdf.w - 60) * 8 > 270:
+            pdf.AddPage(path)
+            pdf.set_y(20) 
+        roundedBox(pdf, color, 20, pdf.get_y() + 2.5, pdf.w - 40, pdf.no_of_lines(f"{i + 1}) {n}",pdf.w - 60) * 8 + 8,status=False)
+        pdf.set_xy(30, pdf.get_y() + 2.5)
+        pdf.multi_cell(pdf.w - 60, 8 , f"{i + 1}) {n}" , align='L')
+    pdf.set_font('Times', '' , 14)
+    roundedBox(pdf,color,20,pdf.get_y() + 5, pdf.w - 40, pdf.no_of_lines(f"Benefits: {content[3]}",pdf.w - 45) * 8 + 5)
+    pdf.set_xy(22.5, pdf.get_y() + 5)
+    pdf.multi_cell(pdf.w - 45, 8 , f"**Benefits:** {content[3]}",markdown=True)
+
+                
+    # content2 = physical(planets,2,name,gender)
+    # content3 = physical(planets,3,name,gender)
+    # content4 = physical(planets,4,name,gender)
+
+    content2 = {'physical_attributes': 'Magizh has a balanced body built with a charming face type. His eyes are expressive and hold a sense of harmony. His physical appearance exudes grace and elegance, while his aura is charismatic and magnetic, drawing others towards him.', 'personality': ['Magizh possesses a charming and diplomatic personality, which helps him navigate social situations with ease.', 'He has a strong sense of justice and fairness, making him a reliable and trustworthy individual.', 'Magizh is creative and artistic, with an eye for beauty and design.'], 'character': ['Magizh is cooperative and seeks harmony in all his interactions, making him a peacemaker in his social circles.', 'He is sociable and enjoys connecting with others, forming meaningful relationships.', 'Magizh is adaptable and can easily adjust to new environments and circumstances.'], 'positive_behavior': ['Magizh exhibits a sense of balance and equilibrium in his actions, making thoughtful decisions.', 'He values relationships and shows empathy towards others, creating a supportive environment.', 'Magizh is diplomatic in his communication, resolving conflicts peacefully and effectively.'], 'negative_behavior': ['Magizh may struggle with indecisiveness, finding it challenging to make firm choices.', 'He might have a tendency to avoid confrontation and suppress his true emotions.', 'Magizh could be overly focused on maintaining external harmony, neglecting his own needs and desires.'], 'parenting_tips': 'To help Magizh overcome his negative behaviors and support his growth, encourage him to express his opinions and feelings openly. Teach him the importance of setting boundaries and asserting himself when necessary. Provide opportunities for Magizh to practice decision-making and assertiveness skills, guiding him to prioritize his own well-being while maintaining harmonious relationships with others. Foster a supportive and nurturing environment that values both his diplomatic nature and his individual needs. Encourage Magizh to seek counseling or therapy if needed to address any underlying issues causing his avoidance of conflict and emotional suppression. Remember to praise and reinforce his efforts towards personal growth and self-expression.'}
+
+    content3 = {'emotional_state': 'Magizh, with the Moon positioned in the 7th house of Aries in Bharani nakshatra along with Planets Moon and Jupiter, tends to have a strong sense of independence and a need for personal space. Magizh believes in taking action and being assertive in order to achieve their goals. Emotionally, Magizh is passionate, determined, and sometimes impatient.', 'emotions': ['Passionate and enthusiastic in pursuing their desires', "Can become easily frustrated when things don't go as planned", 'Has a fiery and competitive spirit when faced with challenges'], 'feelings': ['Feels a strong sense of individuality and self-reliance', 'Experiences a drive to constantly seek new experiences and adventures', 'May feel restless or impulsive when restricted or confined'], 'reactions': ['Responds quickly to situations with courage and boldness', 'May become defensive when their independence is questioned', 'Takes the lead and initiates action in group settings'], 'negative_imbalance': ['Tendency towards impulsiveness leading to rash decision-making', "Difficulty in compromising and considering others' perspectives", 'Struggles with anger issues and maintaining harmony in relationships'], 'parenting_tips': "To support Magizh in managing their negative emotional imbalances and foster growth, it is important to encourage self-reflection and mindfulness. Parents can help Magizh by teaching them the importance of taking a pause before reacting impulsively. Encourage open communication and active listening to understand others' viewpoints. Provide outlets for physical activities to channel the excess energy positively. Set boundaries and teach conflict resolution skills to promote healthy relationships. Practice gratitude and positivity to cultivate emotional balance."}
+
+    content4 = {'core_insights': "Magizh, with the Sun positioned in the 3rd house of Sagittarius in Mula nakshatra, is driven by a deep desire for knowledge and intellectual pursuits. His core identity is centered around exploration, seeking truth and meaning, and expressing his beliefs with conviction. His inner strength lies in his optimism, curiosity, and adaptability, which enable him to navigate various challenges with a sense of adventure and purpose. However, Magizh's ego can sometimes be overly proud and self-righteous, leading to conflicts in relationships and a tendency to impose his views on others.", 'recognitions': ['Magizh seeks recognition for his intellectual achievements and philosophical insights.', 'He also craves acknowledgment for his ability to communicate persuasively and inspire others.', 'Magizh desires recognition for his adventurous spirit and willingness to explore new ideas and cultures.'], 'core_identity': ["Magizh's core identity is shaped by his quest for truth and wisdom.", 'His belief in the power of knowledge and education drives his actions and interactions with others.', "Magizh's identity is rooted in his philosophical nature, love for learning, and his ability to inspire those around him."], 'parenting_tips': 'Encourage Magizh to practice humility and empathy in his interactions with others. Teach him to listen actively, consider different perspectives, and appreciate the diversity of opinions and experiences. Guide Magizh to engage in meaningful conversations that foster understanding and mutual respect. By nurturing these qualities, Magizh can develop a more balanced sense of self and build stronger connections with those around him.'}
+    
+    content = [content2,content3,content4]
+    titles = [{
+        'physical_attributes': "Physical Attributes",
+        'personality': "Outer Personality", 
+        'character': "Character",
+        'positive_behavior': "Positive Behavior",
+        'negative_behavior': "Behavior Challenges",
+        'parenting_tips' : f"Parenting Tips For {name}'s Behaviour Challenges" 
+        }, {
+            'emotional_state' : f"{name}'s Emotional State Insights", 
+            'emotions': f"{name}'s Emotions",
+            'feelings' : f"{name}'s Feelings",
+            'reactions' : f"{name}'s Reactions",
+            'negative_imbalance' : f"{name}'s Emotional Imbalance Challenges",
+            'parenting_tips' : f"Parenting Tips"
+        },{
+            'core_insights' : f"{name}'s Soul Desire",
+            'recognitions' : f"Seek For Recognition", 
+            'core_identity': "Core Identity", 
+            'ego': f"{name}'s Soul Ego", 
+            'negative_ego': f"{name}'s Ego Challenges", 
+            'parenting_tips': f"Parenting Tips For Self Identity Challenges"
+         }]
+
+    pdf.AddPage(path,"Outer World - Physical Attributes, Personality, and Behavior")
+    pdf.set_text_color(0,0,0)
+        
+    for index,c in enumerate(content):
+        if index == 1:
+            pdf.AddPage(path,"Inner World - Emotional Needs and Soul Desire ")
+            
+        if pdf.get_y() + 40 >= 260:
+            pdf.AddPage(path)
+            pdf.set_y(30)
+        pdf.set_text_color(0, 0, 0)
+        if isinstance(c, str):
+            pdf.set_font('Karma-Semi', '', 18)
+            pdf.set_xy(45,pdf.get_y() + 10)
+            pdf.multi_cell(pdf.w - 90, 8, f"{titles[index]}", align='C')
+            pdf.set_font('Karma-Regular', '', 14)
+            pdf.set_xy(22.5,pdf.get_y() + 5)
+            pdf.multi_cell(pdf.w - 45, 7, f"        {c}", align='L')
+        else:
+            for k, v in c.items():
+                if pdf.get_y() + 40 >= 260:  
+                    pdf.AddPage(path)
+                    pdf.set_y(30)
+                pdf.ContentDesign(random.choice(DesignColors),titles[index][k],v,path,name)
+            
+    pdf.AddPage(path,f"{name}'s Education and Intellect")
+    pdf.set_font('Karma-Semi','', 16)
+    pdf.set_y(pdf.get_y() + 10)
+    pdf.cell(0,0,f"Insights about {name}'s education and intelligence",align='C')
+    pdf.set_font('Karma-Regular', '', 14)
+    
+    educationTitle = {
+        "insights" : "Education and Intellectual Insights",
+        "suitable_educational" : "Higher Education Preferences", 
+        "cognitive_abilities" : "Learning Approaches", 
+        "recommendations" : "How To Do It:"
+    }
+    
+    content = education[moon['sign']]
+
+    con = {'insights': content[0], 'suitable_educational': content[1], 'cognitive_abilities': content[2], 'recommendations': content[4]}
+    
+    pdf.set_text_color(0, 0, 0)
+    
+    for index,(k, v) in enumerate(con.items()):
+        if pdf.get_y() + 40 >= 260:  
+            pdf.AddPage(path)
+            pdf.set_y(30)
+        if index == 3:
+            if pdf.get_y() + 30 >= 260:
+                pdf.AddPage(path)
+                pdf.set_y(20)
+                
+            pdf.set_y(pdf.get_y())
+            pdf.image(f"{path}/icons/pg 33_personalized.png",pdf.w / 2 - 10,pdf.get_y(),20,20)
+            pdf.set_y(pdf.get_y() + 25)
+            pdf.set_font('Karma-Semi' , '' , 18)
+            pdf.cell(0,0,"Parenting Tip for Academic Excellence:", align='C')
+            pdf.set_font_size(15)
+            pdf.set_y(pdf.get_y() + 10) 
+            pdf.cell(0,0, content[3],align='C')
+            pdf.set_y(pdf.get_y() + 5)
+            
+            if pdf.get_y() + 40 >= 260:  
+                pdf.AddPage(path)
+                pdf.set_y(30)
+            
+        pdf.ContentDesign(random.choice(DesignColors),educationTitle[k],v,path,name)
+            
+    pdf.AddPage(path,"Family and Relationships")
+    # con = physical(planets,5,name,gender)
+    con = {'family_relationship': "Based on Magizh's astrology details, it can be inferred that Magizh's social development, friendship dynamics, peer interactions, and family relationships are influenced by the placements of planets in the 7th House (Aries), 11th House (Leo), Sun (Sagittarius), Moon (Aries), and Venus (Libra). Magizh's family relationships are characterized by strong bonds with parents and siblings, with a focus on nurturing and supportive interactions. In terms of social development, Magizh tends to form friendships based on mutual respect and shared interests, seeking harmony and balance in relationships.", 'approaches': [{'title': 'Building Relationships with Father (Sun in Sagittarius)', 'content': 'Magizh can bond with the father by engaging in intellectual discussions, exploring new ideas and beliefs together, and participating in activities that promote personal growth and expansion of knowledge.'}, {'title': 'Bonding with Mother (Moon in Aries)', 'content': 'Magizh can connect with the mother through emotional expression, support in times of need, and engaging in physical activities together to foster a sense of closeness and security.'}, {'title': 'Strengthening Sibling Relationships', 'content': 'Magizh can enhance sibling relationships by fostering open communication, being supportive and understanding, and engaging in collaborative activities that promote mutual growth and bonding.'}, {'title': 'Developing Friendships', 'content': 'Magizh can build friendships by being a good listener, showing empathy and understanding, and participating in social activities that align with shared values and interests.'}], 'parenting_support': [{'title': 'Encouraging Open Communication', 'content': 'Parents can encourage Magizh to express thoughts and feelings openly, create a safe space for dialogue, and actively listen to his concerns and experiences to strengthen the parent-child relationship.'}, {'title': 'Promoting Independence', 'content': 'Parents can support Magizh in developing independence, decision-making skills, and autonomy by allowing him to take on responsibilities and make choices within a safe and supportive environment.'}, {'title': 'Cultivating Emotional Intelligence', 'content': "Parents can help Magizh develop emotional intelligence by teaching him to identify and manage his emotions, understand others' perspectives, and communicate effectively in various social settings."}]}
+    
+    familyTitle = {
+        'family_relationship' : "",
+        'approaches': f"{name}'s Approaches for Forming Relationships",
+        'parenting_support' : f"Parenting Support for Improve {name}'s Social Developments"
+    }
+    
+    for k, v in con.items():
+        if pdf.get_y() + 40 >= 260:  
+            pdf.AddPage(path)
+            pdf.set_y(30)
+        
+        pdf.ContentDesign(random.choice(DesignColors),familyTitle[k],v,path,name)
+                
+    pdf.AddPage(path,f"{name}'s Career and Professions")
+    pdf.set_font('Karma-Semi','', 16)
+    pdf.set_xy(20,pdf.get_y() + 10)
+    pdf.multi_cell(pdf.w - 40,8,"Wondering what the future holds for your child's career journey?",align='L')
+    contents = carrer[sifted[9]]
+    profess = []
+    for k,v in contents[1].items():
+        profess.append({
+            'title' : k,
+            'content' : v
+        })
+    
+    con = {'career_path': contents[0], 'suitable_professions': profess}
+
+    CarrerTitle = {
+        "suitable_professions" : f"{name}'s Successful Career Path & Suitable Professions", 
+        "business": "Business & Entrepreneurial Potentials"
+    }
+    
+    for index,(k, v) in enumerate(con.items()):
+        if pdf.get_y() + 40 >= 260:  
+            pdf.AddPage(path)
+            pdf.set_y(30)
+        
+        if index == 0:    
+            pdf.ContentDesign(random.choice(DesignColors),"",v,path,name)
+        else:
+            for v1 in v:
+                v1['content'] = v1['content'].replace(sifted[9], name)
+            pdf.ContentDesign(random.choice(DesignColors),CarrerTitle[k],v,path,name)
+       
+    pdf.AddPage(path,"Subconscious Mind Analysis")
+    pdf.set_y(pdf.get_y() + 5)
+    pdf.set_text_color(0,0,0)
+    pdf.set_font('Karma-Regular', '', 14)
+    eigth_house = sifted[7]
+    con = subContent[eigth_house]
+    pdf.lineBreak(con[0].replace('child',name).replace('Child',name),path,random.choice(DesignColors))
+    
+    pdf.set_y(pdf.get_y() + 5)
+        
+    pdf.ContentDesign(random.choice(DesignColors),f"{name}'s Hidden Challenges",con[1],path,name)
+    
+    content = con[2]['manifestation']
+    pdf.AddPage(path)
+    pdf.set_y(pdf.get_y() + 10)
+    if eigth_house == "Scorpio":
+        pdf.set_y(pdf.get_y() - 5)
+    color = random.choice(DesignColors)
+    roundedBox(pdf,color,20, pdf.get_y(), pdf.w - 40, 90)
+    pdf.image(f"{path}/babyImages/mani.png",22.5,pdf.get_y() + 2.5,20,20)
+    pdf.set_font('Karma-Semi', '', 18)
+    pdf.set_y(pdf.get_y() + 2.5)
+    pdf.cell(0,10,"Manifestation Remedy",align='C')
+    pdf.set_font_size(13)
+    pdf.set_xy(30, pdf.get_y() + 15)
+    pdf.multi_cell(pdf.w - 60, 8,content[0],align='C')
+    pdf.set_font('Karma-Regular', '', 12)
+    pdf.set_xy(40, pdf.get_y())
+    pdf.multi_cell(pdf.w - 80, 8, f"{content[1]}",align='C')
+    pdf.set_xy(22.5, pdf.get_y())
+    pdf.set_font('Karma-Heavy', '' , 16) 
+    pdf.cell(0,10,"How To Do It:", align='L')
+    pdf.set_font('Karma-Regular', '' , 14)
+    pdf.set_y(pdf.get_y() + 7.5)
+    for i,n in enumerate(content[2]):
+        n = n.replace("child",name).replace("Child",name)
+        roundedBox(pdf, color, 20, pdf.get_y() + 2.5, pdf.w - 40, pdf.no_of_lines(f"{i + 1}) {n}",pdf.w - 60) * 8 + 16,status=False)
+        pdf.set_xy(30, pdf.get_y() + 2.5)
+        if eigth_house == "Scorpio":
+            pdf.set_xy(30, pdf.get_y() - 2.5)
+        pdf.multi_cell(pdf.w - 60, 8 , f"{i + 1}) {n}" , align='L')
+    pdf.set_font('Times', '' , 14)
+    roundedBox(pdf,color,20,pdf.get_y(), pdf.w - 40, pdf.no_of_lines(f"Counts: {content[3]}",pdf.w - 45) * 8 + 10,status=False)
+    pdf.set_xy(22.5, pdf.get_y())
+    pdf.multi_cell(pdf.w - 45, 8 , f"**Counts:** {content[3]}",markdown=True)
+    pdf.set_font('Times', '' , 14)
+    roundedBox(pdf,color,20,pdf.get_y(), pdf.w - 40, pdf.no_of_lines(f"Why it works: {content[4]}",pdf.w - 45) * 8 + 5)
+    pdf.set_xy(22.5, pdf.get_y())
+    pdf.multi_cell(pdf.w - 45, 8 , f"**Why it works:** {content[4]}",markdown=True)
+            
+    content = con[2]['quantum']
+    pdf.set_y(pdf.get_y() + 10)
+    color = random.choice(DesignColors)
+    roundedBox(pdf,color,20, pdf.get_y(), pdf.w - 40, 90)
+    pdf.image(f"{path}/babyImages/atom.png",22.5,pdf.get_y() + 2.5,20,20)
+    pdf.set_font('Karma-Semi', '', 18)
+    pdf.set_y(pdf.get_y() + 2.5)
+    pdf.cell(0,10,"Quantum Physics Concept Remedy",align='C')
+    pdf.set_font_size(13)
+    pdf.set_xy(30, pdf.get_y() + 15)
+    pdf.multi_cell(pdf.w - 60, 8,content[0],align='C')
+    pdf.set_font('Karma-Regular', '', 12)
+    pdf.set_xy(40, pdf.get_y())
+    pdf.multi_cell(pdf.w - 80, 8, f"{content[1]}",align='C')
+    pdf.set_xy(22.5, pdf.get_y())
+    pdf.set_font('Karma-Heavy', '' , 16) 
+    pdf.cell(0,10,"How To Do It:", align='L')
+    pdf.set_font('Karma-Regular', '' , 14)
+    pdf.set_y(pdf.get_y() + 7.5)
+    for i,n in enumerate(content[2]):
+        n = n.replace("child",name).replace("Child",name)
+        roundedBox(pdf, color, 20, pdf.get_y() + 2.5, pdf.w - 40, pdf.no_of_lines(f"{i + 1}) {n}",pdf.w - 60) * 8 + 16,status=False)
+        pdf.set_xy(30, pdf.get_y() + 2.5)
+        if eigth_house == "Scorpio":
+            pdf.set_xy(30, pdf.get_y() - 2.5)
+        pdf.multi_cell(pdf.w - 60, 8 , f"{i + 1}) {n}" , align='L')
+    pdf.set_font('Times', '' , 14)
+    roundedBox(pdf,color,20,pdf.get_y(), pdf.w - 40, pdf.no_of_lines(f"Counts: {content[3]}",pdf.w - 45) * 8 + 10,status=False)
+    pdf.set_xy(22.5, pdf.get_y())
+    pdf.multi_cell(pdf.w - 45, 8 , f"**Counts:** {content[3]}",markdown=True)
+    pdf.set_font('Times', '' , 14)
+    roundedBox(pdf,color,20,pdf.get_y(), pdf.w - 40, pdf.no_of_lines(f"Why it works: {content[4]}",pdf.w - 45) * 8 + 5)
+    pdf.set_xy(22.5, pdf.get_y())
+    pdf.multi_cell(pdf.w - 45, 8 , f"**Why it works:** {content[4]}",markdown=True)
+    
+    content = con[2]['healing']
+    pdf.AddPage(path)
+    pdf.set_y(pdf.get_y() + 10)
+    if eigth_house == "Scorpio" or eigth_house == "Cancer":
+        pdf.set_y(pdf.get_y() - 5)
+    color = random.choice(DesignColors)
+    roundedBox(pdf,color,20, pdf.get_y(), pdf.w - 40, 90)
+    pdf.image(f"{path}/babyImages/heart.png",22.5,pdf.get_y() + 2.5,20,20)
+    pdf.set_font('Karma-Semi', '', 18)
+    pdf.set_y(pdf.get_y() + 2.5)
+    pdf.cell(0,10,"Healing Remedy",align='C')
+    pdf.set_font_size(13)
+    pdf.set_xy(30, pdf.get_y() + 15)
+    pdf.multi_cell(pdf.w - 60, 8,content[0],align='C')
+    pdf.set_font('Karma-Regular', '', 12)
+    pdf.set_xy(40, pdf.get_y())
+    pdf.multi_cell(pdf.w - 80, 8, f"{content[1]}",align='C')
+    pdf.set_xy(22.5, pdf.get_y())
+    pdf.set_font('Karma-Heavy', '' , 16) 
+    pdf.cell(0,10,"How To Do It:", align='L')
+    pdf.set_font('Karma-Regular', '' , 14)
+    if eigth_house == "Scorpio":
+        pdf.set_font_size(13)
+    pdf.set_y(pdf.get_y() + 7.5)
+    for i,n in enumerate(content[2]):
+        n = n.replace("child",name).replace("Child",name)
+        roundedBox(pdf, color, 20, pdf.get_y() + 2.5, pdf.w - 40, pdf.no_of_lines(f"{i + 1}) {n}",pdf.w - 60) * 8 + 16,status=False)
+        pdf.set_xy(30, pdf.get_y() + 2.5)
+        if eigth_house == "Scorpio":
+            pdf.set_xy(30, pdf.get_y() - 2.5)
+        pdf.multi_cell(pdf.w - 60, 8 , f"{i + 1}) {n}" , align='L')
+    pdf.set_font('Times', '' , 14)
+    roundedBox(pdf,color,20,pdf.get_y(), pdf.w - 40, pdf.no_of_lines(f"Counts: {content[3]}",pdf.w - 45) * 8 + 10,status=False)
+    pdf.set_xy(22.5, pdf.get_y())
+    pdf.multi_cell(pdf.w - 45, 8 , f"**Counts:** {content[3]}",markdown=True)
+    pdf.set_font('Times', '' , 14)
+    roundedBox(pdf,color,20,pdf.get_y(), pdf.w - 40, pdf.no_of_lines(f"Why it works: {content[4]}",pdf.w - 45) * 8 + 5)
+    pdf.set_xy(22.5, pdf.get_y())
+    pdf.multi_cell(pdf.w - 45, 8 , f"**Why it works:** {content[4]}",markdown=True)
+            
+    content = con[2]['mudra']
+    pdf.set_y(pdf.get_y() + 10)
+    color = random.choice(DesignColors)
+    roundedBox(pdf,color,20, pdf.get_y(), pdf.w - 40, 90)
+    pdf.image(f"{path}/babyImages/mudra.png",22.5,pdf.get_y() + 2.5,20,20)
+    pdf.set_font('Karma-Semi', '', 18)
+    pdf.set_y(pdf.get_y() + 2.5)
+    pdf.cell(0,10,"Mudra Remedy",align='C')
+    pdf.set_font_size(13)
+    pdf.set_xy(30, pdf.get_y() + 15)
+    pdf.multi_cell(pdf.w - 60, 8,content[0],align='C')
+    pdf.set_font('Karma-Regular', '', 12)
+    pdf.set_xy(40, pdf.get_y())
+    pdf.multi_cell(pdf.w - 80, 8, f"{content[1]}",align='C')
+    pdf.set_xy(22.5, pdf.get_y())
+    pdf.set_font('Karma-Heavy', '' , 16) 
+    pdf.cell(0,10,"How To Do It:", align='L')
+    pdf.set_font('Karma-Regular', '' , 14)
+    if eigth_house == "Scorpio":
+        pdf.set_font_size(13)
+    pdf.set_y(pdf.get_y() + 7.5)
+    for i,n in enumerate(content[2]):
+        n = n.replace("child",name).replace("Child",name)
+        roundedBox(pdf, color, 20, pdf.get_y() + 2.5, pdf.w - 40, pdf.no_of_lines(f"{i + 1}) {n}",pdf.w - 60) * 8 + 16,status=False)
+        pdf.set_xy(30, pdf.get_y() + 2.5)
+        if eigth_house == "Scorpio" or eigth_house == "Cancer":
+            pdf.set_xy(30, pdf.get_y() - 2.5)
+        pdf.multi_cell(pdf.w - 60, 8 , f"{i + 1}) {n}" , align='L')
+    pdf.set_font('Times', '' , 14)
+    roundedBox(pdf,color,20,pdf.get_y(), pdf.w - 40, pdf.no_of_lines(f"Counts: {content[3]}",pdf.w - 45) * 8 + 10,status=False)
+    pdf.set_xy(22.5, pdf.get_y())
+    pdf.multi_cell(pdf.w - 45, 8 , f"**Counts:** {content[3]}",markdown=True)
+    pdf.set_font('Times', '' , 14)
+    roundedBox(pdf,color,20,pdf.get_y(), pdf.w - 40, pdf.no_of_lines(f"Why it works: {content[4]}",pdf.w - 45) * 8 + 5)
+    pdf.set_xy(22.5, pdf.get_y())
+    pdf.multi_cell(pdf.w - 45, 8 , f"**Why it works:** {content[4]}",markdown=True)
+        
+    pdf.AddPage(path,"Unique Talents and Natural Skills")
+    
+    uniqueTitle = {
+        'insights': "", 
+        'education' : "Unique Talents in Academics", 
+        'arts_creative' :"Unique Talents in Arts & Creativity",
+        'physical_activity': "Unique Talents in Physical Activity"
+    }
+    
+    # con = chapterPrompt(planets,0,name,gender)
+    con = {'education': [{'title': 'Analytical Skills', 'content': 'Magizh has a natural talent for analyzing information and making logical connections. With Mercury positioned in the 3rd house of Sagittarius, in Mula nakshatra, he is likely to have a deep curiosity and a thirst for knowledge. Encourage him to explore various subjects and engage in intellectual pursuits to enhance his analytical abilities.'}, {'title': 'Communication Skills', 'content': 'Due to Mercury in the 3rd house of Sagittarius, Magizh possesses excellent communication skills. He is likely to be articulate, expressive, and persuasive in his speech. Foster his communication skills by encouraging him to participate in debates, public speaking, or writing activities.'}, {'title': 'Adventurous Learning', 'content': 'With Mercury in Sagittarius in Mula nakshatra, Magizh excels in adventurous learning experiences. He may thrive in environments that offer hands-on learning, travel opportunities, and exposure to diverse cultures. Encourage him to pursue academic interests that challenge his intellect and broaden his horizons.'}], 'arts_creative': [{'title': 'Visual Arts', 'content': 'Magizh has a natural talent for visual arts, thanks to Venus positioned in the 1st house of Libra in Vishakha nakshatra. He may excel in painting, drawing, or graphic design. Provide him with opportunities to explore and develop his artistic skills through classes, workshops, or creative projects.'}, {'title': 'Harmonious Expression', 'content': 'With Venus in the 1st house of Libra, Magizh possesses a talent for harmonious expression in his artistic endeavors. He may have a keen sense of aesthetics and a knack for creating beauty. Encourage him to express himself through art, music, or design to tap into his creative potential.'}, {'title': 'Emotional Sensitivity', 'content': 'Venus in Libra in Vishakha nakshatra endows Magizh with emotional sensitivity and empathy. He may excel in artistic fields that require emotional depth and understanding. Nurture his emotional intelligence by encouraging him to explore poetry, music, or theatre to enhance his creative abilities.'}], 'physical_activity': [{'title': 'Endurance and Stamina', 'content': 'Magizh possesses strong physical abilities, particularly in endurance and stamina, with Mars in the 2nd house of Scorpio in Jyeshtha nakshatra. He may excel in activities that require physical strength and perseverance. Support his interest in sports, martial arts, or other physical pursuits to enhance his physical abilities.'}, {'title': 'Competitive Spirit', 'content': 'With Mars in Scorpio in Jyeshtha nakshatra, Magizh has a competitive spirit and enjoys challenges. He may thrive in competitive sports or activities that push his limits. Encourage him to engage in healthy competition to channel his energy effectively and achieve personal growth.'}, {'title': 'Leadership Skills', 'content': 'Mars in Scorpio in Jyeshtha nakshatra indicates that Magizh has strong leadership qualities. He may naturally take charge in group activities and inspire others to follow his lead. Foster his leadership skills by providing opportunities for him to take on roles of responsibility and lead by example.'}]}
     
     for index,(k, v) in enumerate(con.items()):
         if pdf.get_y() + 40 >= 260:  
@@ -1610,8 +4570,8 @@ def generateBabyReport(formatted_date,formatted_time,location,lat,lon,planets,pa
         
         
     pdf.AddPage(path,"Karmic Life Lessons")        
-    con = chapterPrompt(planets,7,name,gender)
-    # con = {'child_responsibility_discipline': "Magizh's karmic life lesson based on Saturn in the Fifth house of Aquarius sign emphasizes the importance of taking responsibility and embracing discipline in all aspects of life. Magizh should avoid being too laid-back or reckless, as Saturn urges him to learn the value of structure and commitment. By cultivating a sense of duty and maturity, Magizh can overcome challenges related to authority and self-discipline.", 'child_desire_ambition': "Magizh's karmic life lesson based on Rahu in the Sixth house of Pisces sign highlights the need to balance and control desires and ambitions. He should avoid indulging in excessive desires or taking shortcuts in pursuit of his ambitions. Rahu's placement suggests that Magizh's purpose in life lies in overcoming illusions and developing a deeper spiritual connection. By staying grounded and focusing on inner growth, Magizh can fulfill his true potential.", 'child_spiritual_wisdom': "Magizh's karmic life lesson based on Ketu in the 12th house of Virgo sign signifies a journey towards spiritual wisdom and detachment. He should avoid getting too attached to material possessions and worldly pursuits, as Ketu encourages letting go of attachments and embracing spiritual insights. Magizh's destiny is aligned with seeking solitude, introspection, and unraveling the mysteries of life. By detaching from material desires and seeking spiritual knowledge, Magizh can fulfill his spiritual destiny."}
+    # con = chapterPrompt(planets,7,name,gender)
+    con = {'child_responsibility_discipline': "Magizh's karmic life lesson based on Saturn in the Fifth house of Aquarius sign emphasizes the importance of taking responsibility and embracing discipline in all aspects of life. Magizh should avoid being too laid-back or reckless, as Saturn urges him to learn the value of structure and commitment. By cultivating a sense of duty and maturity, Magizh can overcome challenges related to authority and self-discipline.", 'child_desire_ambition': "Magizh's karmic life lesson based on Rahu in the Sixth house of Pisces sign highlights the need to balance and control desires and ambitions. He should avoid indulging in excessive desires or taking shortcuts in pursuit of his ambitions. Rahu's placement suggests that Magizh's purpose in life lies in overcoming illusions and developing a deeper spiritual connection. By staying grounded and focusing on inner growth, Magizh can fulfill his true potential.", 'child_spiritual_wisdom': "Magizh's karmic life lesson based on Ketu in the 12th house of Virgo sign signifies a journey towards spiritual wisdom and detachment. He should avoid getting too attached to material possessions and worldly pursuits, as Ketu encourages letting go of attachments and embracing spiritual insights. Magizh's destiny is aligned with seeking solitude, introspection, and unraveling the mysteries of life. By detaching from material desires and seeking spiritual knowledge, Magizh can fulfill his spiritual destiny."}
 
     
     karmicTitle = {
@@ -1816,8 +4776,8 @@ def generateBabyReport(formatted_date,formatted_time,location,lat,lon,planets,pa
     
     pdf.image(f"{path}/babyImages/dasa.png",110,25,90,0)
     
-    dasaOut = dasaPrompt(year,planets,dasa,name,gender)
-    # dasaOut = [{'dasa': 'Venus', 'bhukthi': 'Mars', 'age': "At Magizh's age, Between 1 to 2", 'prediction': {'insights': "During Magizh's Venus Dasa and Mars Bhukti period, the focus will be on relationships and transformation. With Venus in the 1st house of Libra in Vishakha nakshatra and Mars in the 2nd house of Scorpio in Jyeshtha nakshatra, there may be challenges related to self-worth and communication, but also opportunities for growth and assertiveness. Magizh's Moon sign Aries adds a fiery and dynamic energy to the mix, guiding him towards leadership and independence.", 'favourable': ['1. Success in professional endeavors: Magizh will excel in his career and receive recognition for his hard work and dedication, leading to new opportunities for growth and advancement.', '2. Strengthened relationships: Magizh will experience deeper connections with loved ones, fostering a sense of support and unity in his personal life.', '3. Enhanced creativity and self-expression: Magizh will find inspiration and creative outlets to express himself, leading to personal satisfaction and fulfillment.'], 'unfavourable': ['1. Communication challenges: Magizh may face misunderstandings or conflicts in his interactions with others, requiring patience and understanding to overcome obstacles.', '2. Financial strain: Magizh may encounter financial setbacks or unexpected expenses, requiring careful budgeting and financial planning to manage resources effectively.', '3. Health concerns: Magizh may experience health issues or fatigue during this period, necessitating self-care and prioritization of well-being.'], 'parenting_tips': 'Strategic Support and Communication Building - Encourage Magizh to express his feelings and thoughts openly, and actively listen to his concerns to foster trust and understanding. Implement regular family meetings to discuss challenges and solutions together, creating a supportive and connected environment. Additionally, practice stress-relief activities like mindfulness or yoga with Magizh to promote emotional balance and resilience during difficult times.'}}, {'dasa': 'Venus', 'bhukthi': 'Rahu', 'age': "At Magizh's age, Between 2 to 5", 'prediction': {'insights': 'Magizh, during the Venus Dasa and Rahu Bhukti period, is likely to experience a mix of positive and challenging situations. Venus in the 1st house of Libra in Vishakha nakshatra indicates a focus on relationships and harmony, while Rahu in the 6th house of Pisces in Revati nakshatra suggests unexpected changes and challenges ahead. With Moon sign Aries, there may be a strong sense of individuality and drive for success.', 'favourable': ['During this period, Magizh may experience increased creativity and artistic talents, leading to recognition and success in creative pursuits.', 'There is a possibility of positive developments in personal relationships, leading to stronger bonds with loved ones and a sense of emotional fulfillment.', 'Magizh may have opportunities for personal growth and self-improvement, leading to a greater sense of confidence and inner peace.'], 'unfavourable': ['Magizh may face challenges in maintaining balance in relationships, leading to conflicts and misunderstandings with others.', 'There may be difficulties in handling financial matters and investments, requiring cautious decision-making to avoid losses.', 'Health issues or unexpected obstacles in career and personal life may arise, causing stress and instability.'], 'parenting_tips': 'To navigate Magizh\'s Dasa and Bhukti period\'s unfavorable results, implement the "Emotional Regulation Technique". Guide Magizh to identify and regulate their emotions effectively by practicing mindfulness and deep breathing exercises. Encourage open communication and provide a safe space to express feelings. Teach problem-solving skills to help Magizh face challenges confidently and seek support when needed. Foster a supportive and understanding environment to navigate through tough times with resilience and emotional strength.'}}, {'dasa': 'Venus', 'bhukthi': 'Jupiter', 'age': "At Magizh's age, Between 5 to 8", 'prediction': {'insights': "During Magizh's Venus Dasa and Jupiter Bhukti period, there may be significant changes in relationships and partnerships due to the influence of Venus in the 1st house of Libra and Jupiter in the 7th house of Aries. Magizh's strong willpower and adventurous spirit, as indicated by the Moon in Aries, will play a key role in shaping these predictions.", 'favourable': ['Magizh is likely to experience a boost in creativity and artistic pursuits, leading to recognition and success in his endeavors.', "Improved communication skills and networking opportunities may enhance Magizh's social connections and bring about new opportunities for growth and expansion in his career.", 'The positive influence of Jupiter in the 7th house may bring about a harmonious and supportive relationship with his partner, fostering mutual understanding and deepening emotional bonds.'], 'unfavourable': ['Magizh may face challenges in maintaining a work-life balance, leading to stress and exhaustion in his daily routine.', 'There could be misunderstandings or conflicts in close relationships, requiring patience and effective communication to resolve differences.', 'Financial setbacks or unexpected expenses may arise, prompting Magizh to reevaluate his financial management and budgeting strategies.'], 'parenting_tips': "To navigate Magizh's Dasa Bhukti unfavourable results, the 'Emotional Regulation Technique' can be effective. Encourage Magizh to express his emotions through journaling or art, practice mindfulness techniques to manage stress, and engage in physical activities to release pent-up energy. Provide a safe space for Magizh to share his feelings and thoughts openly, and offer guidance on problem-solving and conflict resolution skills. Encouraging healthy outlets for emotional expression and promoting self-care practices will empower Magizh to navigate through challenging times with resilience and positivity."}}]
+    # dasaOut = dasaPrompt(year,planets,dasa,name,gender)
+    dasaOut = [{'dasa': 'Venus', 'bhukthi': 'Mars', 'age': "At Magizh's age, Between 1 to 2", 'prediction': {'insights': "During Magizh's Venus Dasa and Mars Bhukti period, the focus will be on relationships and transformation. With Venus in the 1st house of Libra in Vishakha nakshatra and Mars in the 2nd house of Scorpio in Jyeshtha nakshatra, there may be challenges related to self-worth and communication, but also opportunities for growth and assertiveness. Magizh's Moon sign Aries adds a fiery and dynamic energy to the mix, guiding him towards leadership and independence.", 'favourable': ['1. Success in professional endeavors: Magizh will excel in his career and receive recognition for his hard work and dedication, leading to new opportunities for growth and advancement.', '2. Strengthened relationships: Magizh will experience deeper connections with loved ones, fostering a sense of support and unity in his personal life.', '3. Enhanced creativity and self-expression: Magizh will find inspiration and creative outlets to express himself, leading to personal satisfaction and fulfillment.'], 'unfavourable': ['1. Communication challenges: Magizh may face misunderstandings or conflicts in his interactions with others, requiring patience and understanding to overcome obstacles.', '2. Financial strain: Magizh may encounter financial setbacks or unexpected expenses, requiring careful budgeting and financial planning to manage resources effectively.', '3. Health concerns: Magizh may experience health issues or fatigue during this period, necessitating self-care and prioritization of well-being.'], 'parenting_tips': 'Strategic Support and Communication Building - Encourage Magizh to express his feelings and thoughts openly, and actively listen to his concerns to foster trust and understanding. Implement regular family meetings to discuss challenges and solutions together, creating a supportive and connected environment. Additionally, practice stress-relief activities like mindfulness or yoga with Magizh to promote emotional balance and resilience during difficult times.'}}, {'dasa': 'Venus', 'bhukthi': 'Rahu', 'age': "At Magizh's age, Between 2 to 5", 'prediction': {'insights': 'Magizh, during the Venus Dasa and Rahu Bhukti period, is likely to experience a mix of positive and challenging situations. Venus in the 1st house of Libra in Vishakha nakshatra indicates a focus on relationships and harmony, while Rahu in the 6th house of Pisces in Revati nakshatra suggests unexpected changes and challenges ahead. With Moon sign Aries, there may be a strong sense of individuality and drive for success.', 'favourable': ['During this period, Magizh may experience increased creativity and artistic talents, leading to recognition and success in creative pursuits.', 'There is a possibility of positive developments in personal relationships, leading to stronger bonds with loved ones and a sense of emotional fulfillment.', 'Magizh may have opportunities for personal growth and self-improvement, leading to a greater sense of confidence and inner peace.'], 'unfavourable': ['Magizh may face challenges in maintaining balance in relationships, leading to conflicts and misunderstandings with others.', 'There may be difficulties in handling financial matters and investments, requiring cautious decision-making to avoid losses.', 'Health issues or unexpected obstacles in career and personal life may arise, causing stress and instability.'], 'parenting_tips': 'To navigate Magizh\'s Dasa and Bhukti period\'s unfavorable results, implement the "Emotional Regulation Technique". Guide Magizh to identify and regulate their emotions effectively by practicing mindfulness and deep breathing exercises. Encourage open communication and provide a safe space to express feelings. Teach problem-solving skills to help Magizh face challenges confidently and seek support when needed. Foster a supportive and understanding environment to navigate through tough times with resilience and emotional strength.'}}, {'dasa': 'Venus', 'bhukthi': 'Jupiter', 'age': "At Magizh's age, Between 5 to 8", 'prediction': {'insights': "During Magizh's Venus Dasa and Jupiter Bhukti period, there may be significant changes in relationships and partnerships due to the influence of Venus in the 1st house of Libra and Jupiter in the 7th house of Aries. Magizh's strong willpower and adventurous spirit, as indicated by the Moon in Aries, will play a key role in shaping these predictions.", 'favourable': ['Magizh is likely to experience a boost in creativity and artistic pursuits, leading to recognition and success in his endeavors.', "Improved communication skills and networking opportunities may enhance Magizh's social connections and bring about new opportunities for growth and expansion in his career.", 'The positive influence of Jupiter in the 7th house may bring about a harmonious and supportive relationship with his partner, fostering mutual understanding and deepening emotional bonds.'], 'unfavourable': ['Magizh may face challenges in maintaining a work-life balance, leading to stress and exhaustion in his daily routine.', 'There could be misunderstandings or conflicts in close relationships, requiring patience and effective communication to resolve differences.', 'Financial setbacks or unexpected expenses may arise, prompting Magizh to reevaluate his financial management and budgeting strategies.'], 'parenting_tips': "To navigate Magizh's Dasa Bhukti unfavourable results, the 'Emotional Regulation Technique' can be effective. Encourage Magizh to express his emotions through journaling or art, practice mindfulness techniques to manage stress, and engage in physical activities to release pent-up energy. Provide a safe space for Magizh to share his feelings and thoughts openly, and offer guidance on problem-solving and conflict resolution skills. Encouraging healthy outlets for emotional expression and promoting self-care practices will empower Magizh to navigate through challenging times with resilience and positivity."}}]
     
     for i,dasaNow in enumerate(dasaOut):
         pdf.set_text_color(hex_to_rgb("#966A2F"))
@@ -2063,8 +5023,8 @@ def generateBabyReport(formatted_date,formatted_time,location,lat,lon,planets,pa
         y_start = pdf.get_y()
         pdf.set_xy(x_start, y_start)    
     
-    content = chapterPrompt(planets,9,name,gender)
-    # content = {'overall': 'Nilan is a Cancer ascendant with Moon in the 2nd house in Leo. The 2nd house Lord, Sun, is in the 6th house of Sagittarius along with Mercury. The 3rd house is Virgo with the 3rd house Lord, Mercury, in the 6th house of Sagittarius along with the Sun. The 4th house is Libra with the 4th house Lord, Venus, in the 7th house of Capricorn along with Saturn. The 5th house is Scorpio with Mars and Ketu, and the 5th house Lord, Mars, in Scorpio along with Ketu. The 6th house is Sagittarius with Sun and Mercury, and the 6th house Lord, Jupiter, in the 8th house of Aquarius. The 7th house is Capricorn with Venus and Saturn, and the 7th house Lord, Saturn, in Capricorn along with Venus. The 8th house is Aquarius with Jupiter in the 8th house and the 8th house Lord, Saturn, in Capricorn along with Venus. The 9th house is Pisces with Jupiter in the 8th house of Aquarius. The 10th house is Aries with Mars in Scorpio along with Ketu. The 11th house is Taurus with Rahu in the 11th house and the 11th house Lord, Venus, in Capricorn along with Saturn. The 12th house is Gemini with the 12th house Lord, Mercury, in the 6th house of Sagittarius along with the Sun.', 'recommendations': "Based on Nilan's planetary positions, it is suggested to nurture his creative and communicative skills. Encouragement in exploring different forms of self-expression can be beneficial. Creating a structured routine for emotional stability and encouraging introspection for personal growth is recommended. Building strong foundations in relationships and emphasizing the importance of discipline and responsibility will support Nilan's overall development.", 'action': "To support Nilan's growth and development, it is advisable to engage in activities that stimulate his creativity and communication skills. Encouraging self-expression through art, writing, or public speaking can boost his confidence. Establishing a daily routine that fosters emotional well-being and setting boundaries to promote discipline and accountability will be beneficial. Providing a nurturing and supportive environment that values introspection and personal growth will help Nilan thrive in all aspects of life."}  
+    # content = chapterPrompt(planets,9,name,gender)
+    content = {'overall': 'Nilan is a Cancer ascendant with Moon in the 2nd house in Leo. The 2nd house Lord, Sun, is in the 6th house of Sagittarius along with Mercury. The 3rd house is Virgo with the 3rd house Lord, Mercury, in the 6th house of Sagittarius along with the Sun. The 4th house is Libra with the 4th house Lord, Venus, in the 7th house of Capricorn along with Saturn. The 5th house is Scorpio with Mars and Ketu, and the 5th house Lord, Mars, in Scorpio along with Ketu. The 6th house is Sagittarius with Sun and Mercury, and the 6th house Lord, Jupiter, in the 8th house of Aquarius. The 7th house is Capricorn with Venus and Saturn, and the 7th house Lord, Saturn, in Capricorn along with Venus. The 8th house is Aquarius with Jupiter in the 8th house and the 8th house Lord, Saturn, in Capricorn along with Venus. The 9th house is Pisces with Jupiter in the 8th house of Aquarius. The 10th house is Aries with Mars in Scorpio along with Ketu. The 11th house is Taurus with Rahu in the 11th house and the 11th house Lord, Venus, in Capricorn along with Saturn. The 12th house is Gemini with the 12th house Lord, Mercury, in the 6th house of Sagittarius along with the Sun.', 'recommendations': "Based on Nilan's planetary positions, it is suggested to nurture his creative and communicative skills. Encouragement in exploring different forms of self-expression can be beneficial. Creating a structured routine for emotional stability and encouraging introspection for personal growth is recommended. Building strong foundations in relationships and emphasizing the importance of discipline and responsibility will support Nilan's overall development.", 'action': "To support Nilan's growth and development, it is advisable to engage in activities that stimulate his creativity and communication skills. Encouraging self-expression through art, writing, or public speaking can boost his confidence. Establishing a daily routine that fosters emotional well-being and setting boundaries to promote discipline and accountability will be beneficial. Providing a nurturing and supportive environment that values introspection and personal growth will help Nilan thrive in all aspects of life."}  
 
     
     pdf.AddPage(path,f"Summary Insights for Parents and Child")
@@ -2085,7 +5045,41 @@ def generateBabyReport(formatted_date,formatted_time,location,lat,lon,planets,pa
         
         pdf.ContentDesign(random.choice(DesignColors),summaryTitle[k],v,path,name)
     
-    pdf.output(f'{path}/pdf/{name} - babyReport.pdf')
+        
+def generateBabyReport(formatted_date,formatted_time,location,lat,lon,planets,panchang,dasa,birthchart,gender,path,year,month,reportIndex,name = None):
+    pdf = PDF('P', 'mm', 'A4')
+    
+    pdf.set_auto_page_break(True)
+    
+    DesignColors = ["#BDE0FE", "#FEFAE0", "#FFC8DD", "#CAF0F8", "#FBE0CE", "#C2BCFF", "#9DE3DB", "#EDBBA3", "#EDF2F4", "#FFD6A5" , "#CBF3DB", "#94D8FD", "#DEE2FF", "#FEEAFA", "#D7AEFF", "#EEE4E1"]
+    
+    pdf.add_font('Karma-Heavy', '', f'{path}/fonts/Linotte-Heavy.ttf')
+    pdf.add_font('Karma-Semi', '', f'{path}/fonts/Linotte-SemiBold.otf') 
+    pdf.add_font('Karma-Regular', '', f'{path}/fonts/Linotte-Regular.otf')
+    
+    if reportIndex == 1:
+        starterReport(pdf,path,planets,panchang,dasa,birthchart,formatted_date,formatted_time,location,year,month,name,DesignColors)
+    elif reportIndex == 2:
+        proReport(pdf,path,planets,panchang,dasa,birthchart,formatted_date,formatted_time,location,year,month,name,DesignColors)
+    elif reportIndex == 3:
+        ultimateReport(pdf,path,planets,panchang,dasa,birthchart,formatted_date,formatted_time,location,year,month,name,DesignColors)
+    elif reportIndex == 4:
+        masterReport(pdf,path,planets,panchang,dasa,birthchart,formatted_date,formatted_time,location,year,month,name,DesignColors)
+    else:
+        return "Invalid Report Index"
+    
+    reportOptions = ["Starter Report","Pro Report","Ultimate Report","Master Report"]
+    
+    pdf.AddPage(path)
+    pdf.set_y(pdf.get_y() + 30)
+    pdf.set_font('Karma-Heavy', '', 32)
+    pdf.cell(0,0, 'Thank You', align='C')
+    pdf.set_y(pdf.get_y() + 20)
+    pdf.image(f'{path}/babyImages/logo.png', pdf.w / 2 - 20, pdf.get_y(), 40, 0)
+    pdf.image(f'{path}/babyImages/ending.png', pdf.w / 2 - 50, pdf.get_y() + 40, 100, 0)
+    
+    
+    pdf.output(f'{path}/pdf/{name} - {reportOptions[reportIndex - 1]}.pdf')
     
 def babyReport(dob,location,lat,lon,path,gender,name,timezone):
     print("Generating Baby Report")
@@ -2098,29 +5092,33 @@ def babyReport(dob,location,lat,lon,path,gender,name,timezone):
         
     for key in panchang.keys():
         print(key,panchang[key])
-    value = "y"
+        
+    print("Which Report to Generate")
+    print("1 for Starter Report")
+    print("2 for Pro Report")
+    print("3 for Ultimate Report")
+    print("4 for Master Report")
     
-    if value.lower() == 'y':
-        dasa = calculate_dasa(dob,planets[2])
-        print("Dasa Calculated")    
-        birthchart = generate_birth_navamsa_chart(planets,f'{path}/chart/',dob,location,name)
-        # birthchart = {
-        #     'birth_chart' : '1.png',
-        #     'navamsa_chart' : '2.png'
-        # }
-        print("Birth Chart Generated")
-        print("Lat Lon Found")
-        dt = datetime.strptime(dob, "%Y-%m-%d %H:%M:%S")
-        formatted_date = dt.strftime("%d %B %Y")
-        formatted_time = dt.strftime("%I:%M:%S %p")
-        
-        year = int(dob[:4])
-        month = int(dob.split("-")[1])
-        
-        generateBabyReport(formatted_date,formatted_time,location,lat,lon,planets,panchang,dasa,birthchart,gender,path,year,month,name)
-
-    else:
-        return "Report Generation Cancelled"
+    reportIndex = int(input())
+    # reportIndex = 1
+  
+    dasa = calculate_dasa(dob,planets[2])
+    print("Dasa Calculated")    
+    # birthchart = generate_birth_navamsa_chart(planets,f'{path}/chart/',dob,location,name)
+    birthchart = {
+        'birth_chart' : '1.png',
+        'navamsa_chart' : '2.png'
+    }
+    print("Birth Chart Generated")
+    print("Lat Lon Found")
+    dt = datetime.strptime(dob, "%Y-%m-%d %H:%M:%S")
+    formatted_date = dt.strftime("%d %B %Y")
+    formatted_time = dt.strftime("%I:%M:%S %p")
+    
+    year = int(dob[:4])
+    month = int(dob.split("-")[1])
+    
+    generateBabyReport(formatted_date,formatted_time,location,lat,lon,planets,panchang,dasa,birthchart,gender,path,year,month,reportIndex,name)
     
     # sender_email = "thepibitech@gmail.com"
     # receiver_email = "guruvijay1925@gmail.com"
@@ -2158,5 +5156,3 @@ def babyReport(dob,location,lat,lon,path,gender,name,timezone):
     #     server.quit()  
     
     # return "Sucess"
-
-babyReport("2023-12-23 03:03:00","Madurai, Tamil Nadu , India",8.9643, 77.556,os.getcwd(),"male","Tharani","5.30")

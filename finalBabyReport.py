@@ -5022,6 +5022,8 @@ def generateBabyReport(formatted_date,formatted_time,location,lat,lon,planets,pa
     
     pdf.output(f'{path}/pdf/{name} - {reportOptions[reportIndex - 1]}.pdf')
     
+    return f"{path}/pdf/{name} - {reportOptions[reportIndex - 1]}.pdf"
+    
 def babyReport(dob,location,lat,lon,path,gender,name,timezone,input):
     print("Generating Baby Report")
     planets = find_planets(dob,lat,lon,timezone)
@@ -5054,7 +5056,7 @@ def babyReport(dob,location,lat,lon,path,gender,name,timezone,input):
     year = int(dob[:4])
     month = int(dob.split("-")[1])
     
-    generateBabyReport(formatted_date,formatted_time,location,lat,lon,planets,panchang,dasa,birthchart,gender,path,year,month,reportIndex,name)
+    pdf_filename = generateBabyReport(formatted_date,formatted_time,location,lat,lon,planets,panchang,dasa,birthchart,gender,path,year,month,reportIndex,name)
     
     sender_email = "thepibitech@gmail.com"
     receiver_email = "theastrokidsai@gmail.com"
@@ -5068,8 +5070,6 @@ def babyReport(dob,location,lat,lon,path,gender,name,timezone,input):
     message.attach(MIMEText(body, "plain"))
     
     name = name.split(" ")[0]
-
-    pdf_filename = f"{path}/pdf/{name} - babyReport.pdf" 
     with open(pdf_filename, "rb") as attachment:
         part = MIMEBase("application", "octet-stream")
         part.set_payload(attachment.read()) 

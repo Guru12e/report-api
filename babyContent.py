@@ -2601,7 +2601,7 @@ healthContent =  {
   ],
   "Scorpio": [
       [
-          "Reproductive System Issues (irregular periods, cramps)",
+          "Hormonal Imbalance Problem (Estrogen & Testosterone Imbalance),Anxiety,Irritability & Anger",
           "Urinary Tract Infections (prone to infections)",
           "Detoxification Problems (sluggish liver, constipation)",
           "Digestive Disorders (IBS, bloating, acidity)",

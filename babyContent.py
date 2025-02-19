@@ -2162,8 +2162,8 @@ healthContent =  {
   ],
   "Taurus": [
       [
-          "Throat Problems (sore throat, tonsillitis)",
-          "Stomach Disorders (slow digestion, bloating)",
+          "Throat and Vocal Cord Issues (hoarseness, thyroid imbalance)",
+          "Digestive Sluggishness (slow metabolism, constipation)",
           "Respiratory Issues (sinus congestion)",
           "Neck and Shoulder Tension (stiffness, pain)",
           "Heavy Weight Gain (prone to being overweight)"
@@ -2963,28 +2963,17 @@ healthContent =  {
 }
 
 healthInsights = {
-  "Aries": "Aries in the 6th house may cause health issues related to the head, eyes, or face, like headaches or sinus troubles. child may also be prone to minor injuries from being active and adventurous. Encouraging regular exercise and a balanced diet will help maintain overall health. Avoid overly spicy foods to prevent acidity or stomach discomfort. Early care and teaching caution during physical activities can keep child healthy and safe.",
-  
+  "Aries": "Aries in the 6th house may cause health issues related to the head, eyes, or face, like headaches or sinus troubles. child may also be prone to minor injuries from being active and adventurous. Encouraging regular exercise and a balanced diet will help maintain overall health. Avoid overly spicy foods to prevent acidity or stomach discomfort. Early care and teaching caution during physical activities can keep child healthy and safe.", 
   "Taurus": "Taurus in the 6th house suggests good physical strength and endurance. child may have a tendency to enjoy rich or heavy foods, which could lead to weight gain or digestive issues. Common health concerns may include throat, neck, or thyroid problems. Encourage regular physical activity and a diet that avoids overeating. Proper hydration and moderation in sweets or fatty foods will help maintain good health.",
-  
   "Gemini": "Gemini in the 6th house points to an active mind and body but may bring issues with the lungs, shoulders, or arms. child could experience allergies, colds, or respiratory sensitivities. Encourage outdoor activities to improve lung health and ensure a stable routine to avoid stress. Consistent sleep patterns and light breathing exercises can help maintain well-being.",
-  
   "Cancer": "Cancer in the 6th house indicates sensitivity in the stomach and digestive system. child may be prone to digestive discomfort or water retention. Emotional stress could also affect health. A balanced diet with warm, home-cooked meals and plenty of hydration is essential. Provide emotional support and stability to keep child in good spirits and health.",
-  
   "Leo": "Leo in the 6th house suggests strong vitality but potential issues with the heart, back, or spine. child may thrive on attention and activity but should avoid overexertion. Encourage activities that promote flexibility and relaxation, like yoga. A diet rich in heart-healthy foods and regular checkups will support long-term health.",
-  
   "Virgo": "Virgo in the 6th house indicates a focus on health but a tendency toward worry or stress, which can lead to digestive issues or anxiety. child may be particular about cleanliness or diet. Encourage mindfulness practices, a simple routine, and a fiber-rich diet to maintain gut health. Keeping a calm environment will benefit both mental and physical well-being.",
-  
   "Libra": "Libra in the 6th house suggests a balanced approach to health but may create concerns around the kidneys, lower back, or skin. child may be sensitive to stress, which can affect digestion or skin health. Encourage relaxation techniques, such as gentle stretching or mindfulness, and a diet that supports kidney health. Regular skin care and staying hydrated are also beneficial for overall well-being.",
-  
   "Scorpio": "Scorpio in the 6th house indicates intense energy but may bring health challenges related to the reproductive system, bladder, or circulatory system. child could experience issues with intense emotions affecting physical health. Encourage regular physical activity, especially activities that release tension, like swimming or cycling. A balanced diet and stress management will help maintain strong health.",
-  
   "Sagittarius": "Sagittarius in the 6th house suggests a love for adventure, which could lead to injuries or overindulgence in physical activities. child may be prone to problems related to the hips, thighs, or liver. Encourage outdoor activities, but emphasize safety. A healthy diet with plenty of fruits, vegetables, and liver-supporting foods will promote overall health. Regular checkups for joint health and staying active can keep child healthy and strong.",
-  
   "Capricorn": "Capricorn in the 6th house indicates a strong and disciplined nature, but health concerns may arise in the bones, joints, or knees. child could experience issues related to stiffness or slow recovery from physical strain. Encourage activities that strengthen bones and joints, like walking or gentle exercise. A diet rich in calcium and vitamin D, along with regular stretching, will help keep child in good health.",
-  
   "Aquarius": "Aquarius in the 6th house suggests a unique approach to health but may bring issues with the nervous system or circulation. child may experience nervous tension or anxiety, which could affect sleep or energy levels. Encourage mental relaxation techniques, such as meditation or quiet time. A balanced diet that includes brain-boosting foods, along with regular physical activity, will help child maintain a healthy body and mind.",
-  
   "Pisces": "Pisces in the 6th house indicates a sensitive health nature, with a tendency to experience issues related to the feet, immune system, or emotional well-being. child may be prone to feeling tired or overwhelmed by stress. Encourage a calm, soothing environment and regular physical activity, such as swimming or walking. A diet that supports the immune system and plenty of rest will keep child healthy and balanced."
 }
 

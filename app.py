@@ -20,7 +20,7 @@ def generate_report():
 @app.route('/freeReport', methods=['POST'])
 def freeReportApi():
     data = request.json
-    planets = freeReport(data['dob'],data['lat'],data['lon'],data['timezone'])
+    planets = freeReport(data['dob'],data['location'],data['lat'],data['lon'], app.root_path, data['gender'], data['name'], "5.30")
     return jsonify(planets), 200
     
 if __name__ == '__main__':

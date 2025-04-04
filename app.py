@@ -5,7 +5,7 @@ from freeReport import freeReport
 from waitress import serve
 
 app = Flask(__name__)
-CORS(app)
+CORS(app,resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
 @app.route('/generate_report', methods=['POST'])
 def generate_report():

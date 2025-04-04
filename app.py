@@ -1,6 +1,7 @@
 from flask import Flask,request,jsonify
 from flask_cors import CORS
 from finalBabyReport import babyReport
+from freeReport import freeReport
 from waitress import serve
 
 app = Flask(__name__)
@@ -15,6 +16,12 @@ def generate_report():
     return jsonify({
         "message" : "Success"
         }), 200
+    
+@app.route('/freeReport', methods=['POST'])
+def freeReportApi():
+    data = request.json
+    planets = freeReport(data['dob'],data['lat'],data['lon'],data['timezone'])
+    return jsonify(planets), 200
     
 if __name__ == '__main__':
     serve(app, host='0.0.0.0', port=5000)

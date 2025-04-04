@@ -58,7 +58,6 @@ def get_planetary_positions(date_str, lat, lon, timezone):
     hours = int(timezone.split(".")[0])
     minutes = int(timezone.split(".")[1])
 
-    # date_time_utc = date_time_ist - datetime.timedelta(hours=hours, minutes=minutes)
     date_time_utc = convert_to_utc(date_str)
 
     jd = swe.julday(date_time_utc.year, date_time_utc.month, date_time_utc.day, date_time_utc.hour + date_time_utc.minute / 60.0 + date_time_ist.second / 3600.0, swe.GREG_CAL)

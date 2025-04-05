@@ -43,7 +43,7 @@ def AstrokidsBot():
                 details = child["childDetails"]
                 try:
                     print(f"Processing report for {details['name']}")
-                    babyReport(f"{details['dob']} {details['time']}:00" , details['place'], details['lat'], details['lon'], root_path, details['gender'], details['name'], "5.30", plans.index(details['plan']) + 1)
+                    babyReport(f"{details['dob']} {details['time']}:00" , details['place'], details['lat'], details['lon'],os.path.dirname(os.path.abspath(__file__)), details['gender'], details['name'], "5.30", plans.index(details['plan']) + 1)
                     print(f"{details['name']} report generated")
 
                     collection.update_one(

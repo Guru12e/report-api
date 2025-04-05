@@ -10,10 +10,6 @@ import os
 from waitress import serve
 from apscheduler.schedulers.background import BackgroundScheduler
 
-client = MongoClient(os.getenv("DATABASE_URL"))
-database = client["AstroKids"]
-collection = database["childDetails"]
-
 plans = [
     "Starter Parenting",
     "Pro Parenting",
@@ -22,6 +18,9 @@ plans = [
 ]
 
 def AstrokidsBot():
+    client = MongoClient(os.getenv("DATABASE_URL"))
+    database = client["AstroKids"]
+    collection = database["childDetails"]
     while True:
         print("Bot is running...")
         try:
@@ -59,8 +58,8 @@ def AstrokidsBot():
         except Exception as e:
             print(f"Main Bot Error: {e}")
         
-        time.sleep(10)  
-
+        time.sleep(3600)
+        
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
@@ -85,4 +84,4 @@ if __name__ == '__main__':
     bot_process.start()
     print("Bot process started!")
     
-    serve(app, host='0.0.0.0', port=5000)
+    app.run(debug=True) 

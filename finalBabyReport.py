@@ -1,7 +1,7 @@
 import random
 import datetime
 from math import atan2, cos, radians, sin
-from fpdf import FPDF,YPos,XPos
+from fpdf import FPDF, YPos, XPos
 from index import find_planets
 from panchang import calculate_panchang
 from chart import generate_birth_navamsa_chart

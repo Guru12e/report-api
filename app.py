@@ -18,12 +18,13 @@ plans = [
 ]
 
 def AstrokidsBot():
-    client = MongoClient(os.getenv("DATABASE_URL"))
-    database = client["AstroKids"]
-    collection = database["childDetails"]
     while True:
         print("Bot is running...")
         try:
+            client = MongoClient(os.getenv("DATABASE_URL")) 
+            database = client["AstroKids"]
+            collection = database["childDetails"]
+
             six_hours_ago = datetime.now() - timedelta(hours=6) 
             
             pipeline = [
@@ -42,7 +43,7 @@ def AstrokidsBot():
                 details = child["childDetails"]
                 try:
                     print(f"Processing report for {details['name']}")
-                    babyReport(f"{details['dob']} {details['time']}:00" , details['place'], details['lat'], details['lon'], app.root_path, details['gender'], details['name'], "5.30", plans.index(details['plan']) + 1)
+                    babyReport(f"{details['dob']} {details['time']}:00" , details['place'], details['lat'], details['lon'], root_path, details['gender'], details['name'], "5.30", plans.index(details['plan']) + 1)
                     print(f"{details['name']} report generated")
 
                     collection.update_one(
@@ -53,12 +54,14 @@ def AstrokidsBot():
                     
                 except Exception as e:
                     print(f"Error processing {details['name']}: {e}")
-                    time.sleep(60)
                     
+            client.close()  
+            
         except Exception as e:
             print(f"Main Bot Error: {e}")
         
         time.sleep(3600)
+
         
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
@@ -66,7 +69,7 @@ CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 @app.route('/generate_report', methods=['POST'])
 def generate_report():
     data = request.json
-    babyReport(data['dob'], data['location'], data['lat'], data['lon'], app.root_path, data['gender'], data['name'], "5.30", data['input'])
+    babyReport(data['dob'], data['location'], data['lat'], data['lon'], os.path.dirname(os.path.abspath(__file__)), data['gender'], data['name'], "5.30", data['input'])
     print("Report generated")
 
     return jsonify({
@@ -83,5 +86,10 @@ if __name__ == '__main__':
     bot_process = Process(target=AstrokidsBot, daemon=True) 
     bot_process.start()
     print("Bot process started!")
-    
-    app.run(debug=True) 
+
+    try:
+        app.run(debug=True)
+    except KeyboardInterrupt:
+        print("Shutting down bot...")
+    finally:
+        bot_process.join()  

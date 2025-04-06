@@ -119,7 +119,7 @@ def start_scheduler():
     global scheduler_started
     if not scheduler_started:
         try:
-            scheduler.add_job(AstrokidsBot, 'interval',minutes=1)  
+            scheduler.add_job(AstrokidsBot, 'interval', hours=1)  
             scheduler.start()
             logger.info("Scheduler started successfully!")
             scheduler_started = True

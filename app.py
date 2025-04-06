@@ -45,7 +45,6 @@ def AstrokidsBot():
         logger.info(f"Found {len(childDetails)} child records")
 
         for child in childDetails:
-            print(child)
             details = child["childDetails"]
             try:
                 logger.info(f"Processing report for {details['name']}")

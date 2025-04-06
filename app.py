@@ -38,13 +38,14 @@ def AstrokidsBot():
                 "childDetails.addedAt": {"$lt": six_hours_ago}, 
                 "childDetails.isChecked": False  
             }},
-            {"$project": {"childDetails": 1, "_id": 0}}
+            {"$project": {"childDetails": 1,"email": 1, "_id": 0}}
         ]
         
         childDetails = list(collection.aggregate(pipeline))
         logger.info(f"Found {len(childDetails)} child records")
 
         for child in childDetails:
+            print(child)
             details = child["childDetails"]
             try:
                 logger.info(f"Processing report for {details['name']}")
@@ -57,7 +58,8 @@ def AstrokidsBot():
                     details['gender'], 
                     details['name'], 
                     "5.30", 
-                    plans.index(details['plan']) + 1
+                    plans.index(details['plan']) + 1,
+                    email=child['email'],
                 )
                 logger.info(f"{details['name']} report generated")
 
@@ -117,7 +119,7 @@ def start_scheduler():
     global scheduler_started
     if not scheduler_started:
         try:
-            scheduler.add_job(AstrokidsBot, 'interval',hours=1)  
+            scheduler.add_job(AstrokidsBot, 'interval',minutes=1)  
             scheduler.start()
             logger.info("Scheduler started successfully!")
             scheduler_started = True

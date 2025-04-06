@@ -53,7 +53,7 @@ def AstrokidsBot():
                     details['place'], 
                     details['lat'], 
                     details['lon'], 
-                    os.path.dirname(os.path.abspath(__file__)), 
+                    app.root_path, 
                     details['gender'], 
                     details['name'], 
                     "5.30", 

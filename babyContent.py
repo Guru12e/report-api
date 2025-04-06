@@ -501,7 +501,7 @@ constitutionRatio = {
      'Vata': 20,
     'Kapha': 10,
   },
-   "Moon" : {
+   "Moon" : {   
      'Kapha': 60,
      'Vata': 30,
      'Pitta': 10,

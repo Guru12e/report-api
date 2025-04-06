@@ -5036,14 +5036,12 @@ def babyReport(dob,location,lat,lon,path,gender,name,timezone,input):
         
     for key in panchang.keys():
         print(key,panchang[key])
-        
-    print("Which Report to Generate")
-    print("1 for Starter Report")
-    print("2 for Pro Report")
-    print("3 for Ultimate Report")
-    print("4 for Master Report")
     
     reportIndex = input
+    
+    reportOptions = ["Starter Report","Pro Report","Ultimate Report","Master Report"]
+    
+    print(reportOptions[reportIndex])
   
     dasa = calculate_dasa(dob,planets[2])
     print("Dasa Calculated")    

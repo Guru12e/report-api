@@ -5019,8 +5019,9 @@ def generateBabyReport(formatted_date,formatted_time,location,lat,lon,planets,pa
     pdf.image(f'{path}/babyImages/logo.png', pdf.w / 2 - 20, pdf.get_y(), 40, 0)
     pdf.image(f'{path}/babyImages/ending.png', pdf.w / 2 - 50, pdf.get_y() + 40, 100, 0)
     
-    
     pdf.output(f'{path}/pdf/{name} - {reportOptions[reportIndex - 1]}.pdf')
+    
+    print(f"PDF generated successfully at {path}/pdf/{name} - {reportOptions[reportIndex - 1]}.pdf")
     
     return f"{path}/pdf/{name} - {reportOptions[reportIndex - 1]}.pdf"
     

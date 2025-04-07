@@ -1405,7 +1405,7 @@ nakshatraNumber = {
   "Krittika": [3, 5],
   "Rohini": [2, 7],
   "Mrigashira": [1, 3],
-  "Aridra": [5, 8],
+  "Ardra": [5, 8],
   "Punarvasu": [3, 6],
   "Pushya": [4, 9],
   "Ashlesha": [8, 7],

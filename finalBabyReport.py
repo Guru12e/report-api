@@ -5028,27 +5028,25 @@ def generateBabyReport(formatted_date,formatted_time,location,lat,lon,planets,pa
     
     return f"{path}/pdf/{name} - {reportOptions[reportIndex - 1]}.pdf"
     
-def babyReport(dob,location,lat,lon,path,gender,name,timezone,input, email):
+def babyReport(dob, location, lat, lon, path, gender, name, timezone, input, email):
     print("Generating Baby Report")
-    planets = find_planets(dob,lat,lon,timezone)
+    planets = find_planets(dob, lat, lon, timezone)
     print("Planets Found")
-    panchang = calculate_panchang(dob,planets[2]['full_degree'],planets[1]['full_degree'],lat,lon)
+    panchang = calculate_panchang(dob, planets[2]['full_degree'], planets[1]['full_degree'], lat, lon)
     print("Panchang Calculated")
     for pl in planets:
-        print(pl['Name'],pl['sign'],pl['nakshatra'],pl['full_degree'])
+        print(pl['Name'], pl['sign'], pl['nakshatra'], pl['full_degree'])
         
     for key in panchang.keys():
-        print(key,panchang[key])
+        print(key, panchang[key])
     
     reportIndex = input
-    
-    reportOptions = ["Starter Report","Pro Report","Ultimate Report","Master Report"]
-    
+    reportOptions = ["Starter Report", "Pro Report", "Ultimate Report", "Master Report"]
     print(reportOptions[reportIndex])
   
-    dasa = calculate_dasa(dob,planets[2])
+    dasa = calculate_dasa(dob, planets[2])
     print("Dasa Calculated")    
-    birthchart = generate_birth_navamsa_chart(planets,f'{path}/chart/',dob,location,name)
+    birthchart = generate_birth_navamsa_chart(planets, f'{path}/chart/', dob, location, name)
     print("Birth Chart Generated")
     print("Lat Lon Found")
     dt = datetime.strptime(dob, "%Y-%m-%d %H:%M:%S")
@@ -5058,7 +5056,7 @@ def babyReport(dob,location,lat,lon,path,gender,name,timezone,input, email):
     year = int(dob[:4])
     month = int(dob.split("-")[1])
     
-    pdf_filename = generateBabyReport(formatted_date,formatted_time,location,lat,lon,planets,panchang,dasa,birthchart,gender,path,year,month,reportIndex,name)
+    pdf_filename = generateBabyReport(formatted_date, formatted_time, location, lat, lon, planets, panchang, dasa, birthchart, gender, path, year, month, reportIndex, name)
     
     sender_email = "theastrokidsai@gmail.com"
     receiver_email = email
@@ -5146,19 +5144,19 @@ def babyReport(dob,location,lat,lon,path,gender,name,timezone,input, email):
         )
         message.attach(part)
 
+    server = None
     try:
         server = smtplib.SMTP("smtp.gmail.com", 587)
         server.starttls()
         server.login(sender_email, password)
         server.sendmail(sender_email, receiver_email, message.as_string())
-        server.quit()
         print("Email with PDF attachment sent successfully")
-    except Exception as e:
-        print("Error sending email:", e)
-
     except Exception as e:
         print(f"Error sending email: {e}")
     finally:
-        server.quit()  
-    
+        if server is not None:
+            try:
+                server.quit()
+            except:
+                pass 
     return "Sucess"

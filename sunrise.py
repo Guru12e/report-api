@@ -2,7 +2,6 @@ from astral.sun import sun
 from astral import LocationInfo
 from datetime import datetime
 import pytz
-    
 
 def get_sun_times(lat,lon, datestr=None):
     if datestr is None:

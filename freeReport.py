@@ -10,4 +10,3 @@ def freeReport(dob,location,lat,lon,path,gender,name,timezone):
         "panchang": panchang,
     }
     
-# print(freeReport("2004-12-25 05:50:00", "Madurai", 8.7642, 78.1348, "E:/report_astrokids/", "Male", "Guru", "5.30"))

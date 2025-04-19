@@ -5030,7 +5030,8 @@ def generateBabyReport(formatted_date,formatted_time,location,lat,lon,planets,pa
     
 def babyReport(dob, location, lat, lon, path, gender, name, timezone, input, email):
     print("Generating Baby Report")
-    planets = find_planets(dob, lat, lon, timezone)
+    planets = find_planets(dob, float(lat), float(lon), timezone)
+    print(planets)
     print("Planets Found")
     panchang = calculate_panchang(dob, planets[2]['full_degree'], planets[1]['full_degree'], lat, lon)
     print("Panchang Calculated")

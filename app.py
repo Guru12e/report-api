@@ -94,7 +94,8 @@ def generate_report():
         data['gender'], 
         data['name'], 
         "5.30", 
-        data['input']
+        data['input'],
+        mail=data['email'],
     )
     logger.info("Report generated")
     return jsonify({"message": "Success"}), 200

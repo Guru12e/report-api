@@ -5042,8 +5042,6 @@ def babyReport(dob, location, lat, lon, path, gender, name, timezone, input, ema
         print(key, panchang[key])
     
     reportIndex = input
-    reportOptions = ["Starter Report", "Pro Report", "Ultimate Report", "Master Report"]
-    print(reportOptions[reportIndex])
   
     dasa = calculate_dasa(dob, planets[2])
     print("Dasa Calculated")    

@@ -302,7 +302,7 @@ def physical(planets,index,name,gender):
         function_call = {"name": "generate_child_inner_personality_report"}
     if index == 4:
         sun = list(filter(lambda x:x['Name'] == "Sun" , planets))[0]
-        content = f"Write {name} Core Identity Motivations Inner Strength Ego Insights in Short Paragraph based on {name}'s Sun Sign Placement {planetPrompt(sun)} Write {name}'s 3 Seek for recognitions, 3 Core Identity Based on Planet Sun Placement Sign and Write 1 Practical Parenting Tip to Change {name}'s Core Identity Challenges for {name} growth write parenting Tip Name How to do with Guide Write Content in Simple Easy English format Use {name} and {gender} Pronouns all over the content."
+        content = f"Write {name} Core Identity Motivations Inner Strength Ego Insights in Short Paragraph based on {name}'s Sun Sign Placement {planetPrompt(sun)} Write {name}'s 3 Seek for recognitions, 3 Core Identity Based on Planet Sun Placement Sign and Write 1 Practical Parenting Tip to Change {name}'s Core Identity Challenges for {name} growth write parenting Tip Name How to do with Guide Write Content in Simple Easy English format Use {name} and {gender} Pronouns all over the content. don't change the key"
         
         function = [
         {

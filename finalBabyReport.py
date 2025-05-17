@@ -4579,7 +4579,8 @@ def masterReport(pdf,path,planets,panchang,dasa,birthchart,formatted_date,format
             end_time = next_saturn['End Date']
     else:
         sadhesati_status = "not" 
-        next_saturn = get_next_sade_sati(saturn_pos,moon['sign'])
+        next_saturn_pos = saturn_pos[saturn_pos.index(current_saturn):]
+        next_saturn = get_next_sade_sati(next_saturn_pos, moon['sign'])
         start_time = next_saturn['Start Date']
         end_time = next_saturn['End Date']
         
@@ -5159,3 +5160,5 @@ def babyReport(dob, location, lat, lon, path, gender, name, timezone, input, ema
             except:
                 pass 
     return "Sucess"
+
+babyReport("2021-08-20 10:48:00", "Madurai", 9.9252, 78.1198, "E:/report_astrokids/", "female", "Jaswidha dheera", "5.30", 4, "sandyshai1315@gmail.com")

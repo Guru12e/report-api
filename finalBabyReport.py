@@ -5160,5 +5160,3 @@ def babyReport(dob, location, lat, lon, path, gender, name, timezone, input, ema
             except:
                 pass 
     return "Sucess"
-
-babyReport("2021-08-20 10:48:00", "Madurai", 9.9252, 78.1198, "E:/report_astrokids/", "female", "Jaswidha dheera", "5.30", 4, "sandyshai1315@gmail.com")

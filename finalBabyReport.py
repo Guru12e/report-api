@@ -345,7 +345,7 @@ class PDF(FPDF):
             else:
                 self.rect(x - 2,self.get_y(),54,8,style='F')
             self.cell(30,8, f"{b['bhukthi']}",align='L')
-            self.cell(20,8,f"upto {months_dict[b['end_month']]} {b['end_year']}",align='R')
+            self.cell(20,8,f"upto {months_dict[b['end_month'] + 1]} {b['end_year']}",align='R')
             
     def roundedContent(self, content , color):
         roundedBox(self, color, 20 , self.get_y() , self.w - 40, self.no_of_lines(f"        {content}",self.w - 45) * 7 + 7.5)

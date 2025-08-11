@@ -129,7 +129,7 @@ def start_scheduler():
         except Exception as e:
             logger.error(f"Failed to start scheduler: {e}")
 
-start_scheduler()
+# start_scheduler()
 
 if __name__ == '__main__':
     logger.info("Running in development mode")

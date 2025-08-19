@@ -2041,7 +2041,10 @@ def proReport(pdf,path,planets,panchang,dasa,birthchart,formatted_date,formatted
         pdf.set_font('Karma-Heavy', '', 20)
         pdf.set_xy(20,pdf.get_y() + 5)
         pdf.multi_cell(pdf.w - 40,10,f"{planet['Name']} - {planetMain[planet['Name']]}",align='C')
-        pdf.image(f"{path}/babyImages/{planet['Name']}.png",40,pdf.get_y() + 10,30,30)
+        if planet['Name'] != "Ascendant":
+            pdf.image(f"{path}/babyImages/{planet['Name']}.png",x - 10,y - 10,20,20)
+        else:
+            pdf.image(f"{path}/babyImages/{planet['sign']}.png",x - 10,y - 10,20,20)
         y = pdf.get_y() + 10
         pdf.set_font('Karma-Regular', '', 12) 
         pdf.set_text_color(0,0,0)
@@ -3334,7 +3337,10 @@ def ultimateReport(pdf,path,planets,panchang,dasa,birthchart,formatted_date,form
         pdf.set_font('Karma-Heavy', '', 20)
         pdf.set_xy(20,pdf.get_y() + 5)
         pdf.multi_cell(pdf.w - 40,10,f"{planet['Name']} - {planetMain[planet['Name']]}",align='C')
-        pdf.image(f"{path}/babyImages/{planet['Name']}.png",40,pdf.get_y() + 10,30,30)
+        if planet['Name'] != "Ascendant":
+            pdf.image(f"{path}/babyImages/{planet['Name']}.png",40,pdf.get_y() + 10,30,30)
+        else:
+            pdf.image(f"{path}/babyImages/{planet['sign']}.png",40,pdf.get_y() + 10,30,30)
         y = pdf.get_y() + 10
         pdf.set_font('Karma-Regular', '', 12) 
         pdf.set_text_color(0,0,0)
@@ -4797,7 +4803,10 @@ def masterReport(pdf,path,planets,panchang,dasa,birthchart,formatted_date,format
         pdf.set_font('Karma-Heavy', '', 20)
         pdf.set_xy(20,pdf.get_y() + 5)
         pdf.multi_cell(pdf.w - 40,10,f"{planet['Name']} - {planetMain[planet['Name']]}",align='C')
-        pdf.image(f"{path}/babyImages/{planet['Name']}.png",40,pdf.get_y() + 10,30,30)
+        if planet['Name'] != "Ascendant":
+            pdf.image(f"{path}/babyImages/{planet['Name']}.png",40,pdf.get_y() + 10,30,30)
+        else:
+            pdf.image(f"{path}/babyImages/{planet['sign']}.png",40,pdf.get_y() + 10,30,30)
         y = pdf.get_y() + 10
         pdf.set_font('Karma-Regular', '', 12) 
         pdf.set_text_color(0,0,0)

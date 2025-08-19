@@ -1,6 +1,7 @@
 # Ignore Python files
 *.pyc
 __pycache__/
+.conda/
 
 # Ignore Node.js modules
 node_modules/

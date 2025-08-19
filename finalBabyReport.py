@@ -5169,3 +5169,5 @@ def babyReport(dob, location, lat, lon, path, gender, name, timezone, input, ema
             except:
                 pass 
     return "Sucess"
+
+# babyReport("2017-01-23 12:05:00", "Madurai, Tamil Nadu, India", "9.9252", "78.1198", r"E:\report_astrokids", "female", "Natchatra M S", "5.30", 4, "guruvijay1925@gmail.com")

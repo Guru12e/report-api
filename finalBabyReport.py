@@ -5070,107 +5070,107 @@ def babyReport(dob, location, lat, lon, path, gender, name, timezone, input, ema
     
     pdf_filename = generateBabyReport(formatted_date, formatted_time, location, lat, lon, planets, panchang, dasa, birthchart, gender, path, year, month, reportIndex, name)
     
-#     sender_email = "theastrokidsai@gmail.com"
-#     receiver_email = email
-#     password = "hsmg sbxp btyi ifhb" 
-#     message = MIMEMultipart()
-#     message["From"] = sender_email
-#     message["To"] = receiver_email
-#     message["Subject"] = f"{name} - Life Prediction Report"
+    sender_email = "theastrokidsai@gmail.com"
+    receiver_email = email
+    password = "hsmg sbxp btyi ifhb" 
+    message = MIMEMultipart()
+    message["From"] = sender_email
+    message["To"] = receiver_email
+    message["Subject"] = f"{name} - Life Prediction Report"
 
-#     html_content = f"""
-#     <html>
-#     <head>
-#     </head>
-#     <body>
-#         <div style="
-#         margin: auto;
-#         width: 100vw;
-#         max-width: 600px;
-#         padding-top: 20px;
-#         position: relative;
-#       ">
-#     <div style="
-#           position: absolute;
-#           top: 0;
-#           left: 0;
-#           z-index: 0;
-#           width: 100vw;
-#           height: 100%;
-#           max-width: 600px;
-#           background: red;
-#           opacity: 0.18;
-#         "></div>
-#     <div style="z-index: 10; color: black; opacity: 1">
-#         <div style="
-#             width: 100%;
-#             margin-top: 40px;
-#             background-color: #210535;
-#           ">
-#             <img src="https://drive.usercontent.google.com/download?id=1MB_IKZo35iEaSzUCaZCqYT9XU39IKh8h" alt="logo"
-#                 style="width: 40%; aspect-ratio: 16 / 9; margin: 0 auto" />
-#         </div>
-#     </div>
-#     <div style="padding: 0 20px">
-#         <div style="width: 100%;">
-#             <h1>Dear Parents,</h1>
-#             <h3>We are excited to share your child's personalized report. Astro Kids ensures that you receive insights with accuracy and care.</h3>
-#         </div>
-#         <div style="color:#210535; font-size:larger;">
-#             <p>Your child's report is now available. Click the button below to view or download the report:</p>
-#         </div>
-#         <div style="color:#210535; font-size:larger;">
-#             <p>If you did not request this report or need assistance, please contact our customer support immediately.<br><br>
-#                 Thank You,<br>
-#                 AstroKids Team
-#             </p>
-#         </div>
-#         <div style="margin-top: 70px">
-#             <p style="font-size: 20px">Warm Regards,</p>
-#             <img src="https://drive.usercontent.google.com/download?id=1MB_IKZo35iEaSzUCaZCqYT9XU39IKh8h"
-#                 alt="signature" width="100px" />
-#             <p>The Astrokids Team</p>
-#             <a>support@astrokids.ai</a>
-#             <a href="https://astrokids.ai/" style="
-#               display: block;
-#               color: black;
-#               text-decoration: none;
-#               margin: 10px 0;
-#             ">astrokids.ai</a>
-#         </div>
-#     </div>
-# </div>
-#     </body>
-#     </html>
-#     """
+    html_content = f"""
+    <html>
+    <head>
+    </head>
+    <body>
+        <div style="
+        margin: auto;
+        width: 100vw;
+        max-width: 600px;
+        padding-top: 20px;
+        position: relative;
+      ">
+    <div style="
+          position: absolute;
+          top: 0;
+          left: 0;
+          z-index: 0;
+          width: 100vw;
+          height: 100%;
+          max-width: 600px;
+          background: red;
+          opacity: 0.18;
+        "></div>
+    <div style="z-index: 10; color: black; opacity: 1">
+        <div style="
+            width: 100%;
+            margin-top: 40px;
+            background-color: #210535;
+          ">
+            <img src="https://drive.usercontent.google.com/download?id=1MB_IKZo35iEaSzUCaZCqYT9XU39IKh8h" alt="logo"
+                style="width: 40%; aspect-ratio: 16 / 9; margin: 0 auto" />
+        </div>
+    </div>
+    <div style="padding: 0 20px">
+        <div style="width: 100%;">
+            <h1>Dear Parents,</h1>
+            <h3>We are excited to share your child's personalized report. Astro Kids ensures that you receive insights with accuracy and care.</h3>
+        </div>
+        <div style="color:#210535; font-size:larger;">
+            <p>Your child's report is now available. Click the button below to view or download the report:</p>
+        </div>
+        <div style="color:#210535; font-size:larger;">
+            <p>If you did not request this report or need assistance, please contact our customer support immediately.<br><br>
+                Thank You,<br>
+                AstroKids Team
+            </p>
+        </div>
+        <div style="margin-top: 70px">
+            <p style="font-size: 20px">Warm Regards,</p>
+            <img src="https://drive.usercontent.google.com/download?id=1MB_IKZo35iEaSzUCaZCqYT9XU39IKh8h"
+                alt="signature" width="100px" />
+            <p>The Astrokids Team</p>
+            <a>support@astrokids.ai</a>
+            <a href="https://astrokids.ai/" style="
+              display: block;
+              color: black;
+              text-decoration: none;
+              margin: 10px 0;
+            ">astrokids.ai</a>
+        </div>
+    </div>
+</div>
+    </body>
+    </html>
+    """
 
-#     message.attach(MIMEText(html_content, "html"))
+    message.attach(MIMEText(html_content, "html"))
 
-#     with open(pdf_filename, "rb") as attachment:
-#         part = MIMEBase("application", "octet-stream")
-#         part.set_payload(attachment.read())
-#         encoders.encode_base64(part)
-#         part.add_header(
-#             "Content-Disposition",
-#             f"attachment; filename={os.path.basename(pdf_filename)}",
-#         )
-#         message.attach(part)
+    with open(pdf_filename, "rb") as attachment:
+        part = MIMEBase("application", "octet-stream")
+        part.set_payload(attachment.read())
+        encoders.encode_base64(part)
+        part.add_header(
+            "Content-Disposition",
+            f"attachment; filename={os.path.basename(pdf_filename)}",
+        )
+        message.attach(part)
 
-#     server = None
-#     try:
-#         server = smtplib.SMTP("smtp.gmail.com", 587)
-#         server.starttls()
-#         server.login(sender_email, password)
-#         server.sendmail(sender_email, receiver_email, message.as_string())
-#         print("Email with PDF attachment sent successfully")
-#     except Exception as e:
-#         print(f"Error sending email: {e}")
-#     finally:
-#         if server is not None:
-#             try:
-#                 server.quit()
-#             except:
-#                 pass 
-#     return "Sucess"
+    server = None
+    try:
+        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server.starttls()
+        server.login(sender_email, password)
+        server.sendmail(sender_email, receiver_email, message.as_string())
+        print("Email with PDF attachment sent successfully")
+    except Exception as e:
+        print(f"Error sending email: {e}")
+    finally:
+        if server is not None:
+            try:
+                server.quit()
+            except:
+                pass 
+    return "Sucess"
 
 # babyReport("2017-01-23 12:05:00", "Madurai, Tamil Nadu, India", "9.9252", "78.1198", r"E:\report_astrokids", "female", "Natchatra M S", "5.30", 4, "guruvijay1925@gmail.com")

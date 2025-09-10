@@ -11,6 +11,7 @@ node_modules/
 
 # Ignore environment files
 .env
+venv/
 
 # Ignore build directories
 /dist/

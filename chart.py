@@ -74,11 +74,11 @@ def draw_birth_chart(positions, filename, path, name="", dob="", location=""):
         canvas_size = (800, 800)
         background_image = Image.new('RGB', canvas_size, 'white')
         
-    try:
-        om_image = Image.open(f'{path}/static/om.png')
-        om_image = om_image.resize((50, 50))
-    except IOError: 
-        print("failed")
+    # try:
+    #     om_image = Image.open(f'{path}/static/om.png')
+    #     om_image = om_image.resize((50, 50))
+    # except IOError: 
+    #     print("failed")
 
     image = Image.new('RGB', canvas_size)
     image.paste(background_image, (0, 0))
@@ -102,9 +102,9 @@ def draw_birth_chart(positions, filename, path, name="", dob="", location=""):
     center_x = canvas_size[0] // 2
     center_y = canvas_size[1] // 2
     
-    if om_image:
-        om_position = (center_x - 25,center_y - 120)  
-        image.paste(om_image, om_position, om_image)
+    # if om_image:
+    #     om_position = (center_x - 25,center_y - 120)  
+    #     image.paste(om_image, om_position, om_image)
 
     name_font = ImageFont.truetype(font_path, 38) if font_path else ImageFont.load_default()
     draw.text((center_x, center_y - 40), name, fill=black, font=name_font, anchor="mm")

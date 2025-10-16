@@ -5044,7 +5044,6 @@ def generateBabyReport(formatted_date,formatted_time,location,lat,lon,planets,pa
 def babyReport(dob, location, lat, lon, path, gender, name, timezone, input, email):
     print("Generating Baby Report")
     planets = find_planets(dob, float(lat), float(lon), timezone)
-    print(planets)
     print("Planets Found")
     panchang = calculate_panchang(dob, planets[2]['full_degree'], planets[1]['full_degree'], lat, lon)
     print("Panchang Calculated")
@@ -5173,4 +5172,4 @@ def babyReport(dob, location, lat, lon, path, gender, name, timezone, input, ema
                 pass 
     return "Sucess"
 
-# babyReport("2017-01-23 12:05:00", "Madurai, Tamil Nadu, India", "9.9252", "78.1198", r"E:\report_astrokids", "female", "Natchatra M S", "5.30", 4, "guruvijay1925@gmail.com")
+babyReport("2004-12-25 05:50:00", "Kadambur, Tamil Nadu, India", "8.9966", "77.8603", r"E:\report_astrokids", "male", "Guru", "5.30", 4, "guruvijay1925@gmail.com")

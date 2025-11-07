@@ -91,7 +91,7 @@ chakras = {
 
 chakra_desc = {
     "Crown Chakra" : [
-       ["A balanced crown chakra (Sahasrara) helps younger children feel connected to the universe and their true self. They tend to be imaginative, curious, and calm, often asking deep questions about life and showing kindness and empathy toward others.", "A dominant crown chakra (Sahasrara) in teens encourages spiritual maturity and a deeper understanding of life's purpose. They often seek truth, show wisdom beyond their age, and maintain inner peace even in challenges, feeling guided by intuition and higher awareness."],
+       "A balanced crown chakra (Sahasrara) helps younger children feel connected to the universe and their true self. They tend to be imaginative, curious, and calm, often asking deep questions about life and showing kindness and empathy toward others.",
         "If imbalanced, they may appear disconnected, overly introspective, or lack direction.",
         {
             "title": "Quiet Reflection and Nature Time",

@@ -5044,19 +5044,23 @@ def generateBabyReport(formatted_date,formatted_time,location,lat,lon,planets,pa
 def babyReport(dob, location, lat, lon, path, gender, name, timezone, input, email):
     print("Generating Baby Report")
     planets = find_planets(dob, float(lat), float(lon), timezone)
+    for pl in planets:
+        print(pl['Name'], pl['sign'], pl['nakshatra'], pl['full_degree'])
     print("Planets Found")
     panchang = calculate_panchang(dob, planets[2]['full_degree'], planets[1]['full_degree'], lat, lon)
     print("Panchang Calculated")
-    for pl in planets:
-        print(pl['Name'], pl['sign'], pl['nakshatra'], pl['full_degree'])
         
     for key in panchang.keys():
         print(key, panchang[key])
     
+    print(panchang)
     reportIndex = input
   
     dasa = calculate_dasa(dob, planets[2])
+    # for (k,v) in dasa.items():
+    #     print(k,v)
     print("Dasa Calculated")    
+    return
     birthchart = generate_birth_navamsa_chart(planets, f'{path}/chart/', dob, location, name)
     print("Birth Chart Generated")
     print("Lat Lon Found")
@@ -5172,4 +5176,4 @@ def babyReport(dob, location, lat, lon, path, gender, name, timezone, input, ema
                 pass 
     return "Sucess"
 
-babyReport("2004-12-25 05:50:00", "Kadambur, Tamil Nadu, India", "8.9966", "77.8603", r"E:\report_astrokids", "male", "Guru", "5.30", 4, "guruvijay1925@gmail.com")
+babyReport("1993-11-03 10:30:00", "Kadambur, Tamil Nadu, India", "9.9252", "78.1198", r"E:\report_astrokids", "male", "Guru", "5.30", 4, "guruvijay1925@gmail.com")
